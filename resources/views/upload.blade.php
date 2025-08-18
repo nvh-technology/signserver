@@ -356,14 +356,14 @@
                         }
 
                         // 2. Tính toán tọa độ các góc từ tâm (pdfX, pdfY)
-                        const llx = pdfX - halfWidth;
-                        const lly = pdfY - halfHeight;
-                        const urx = pdfX + halfWidth;
-                        const ury = pdfY + halfHeight;
+                        const llx = Math.round(pdfX - halfWidth);
+                        const lly = Math.round(pdfY - halfHeight);
+                        const urx = Math.round(pdfX + halfWidth);
+                        const ury = Math.round(pdfY + halfHeight);
                         // === KẾT THÚC THAY ĐỔI LOGIC ===
 
                         selectedPosition =
-                            `${llx.toFixed(2)},${lly.toFixed(2)},${urx.toFixed(2)},${ury.toFixed(2)}`;
+                            `${llx},${lly},${urx},${ury}`;
                         renderAllPagesAndHighlight();
                     });
                 });
