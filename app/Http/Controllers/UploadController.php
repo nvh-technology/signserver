@@ -27,7 +27,8 @@ class UploadController extends Controller
 
         $file = $request->file('file_to_sign');
         $fileName = $file->getClientOriginalName();
-        $path = $file->storeAs('sign_documents', \Str::random().$fileName, 'local');
+        $storeName = \Str::random() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('sign_documents', $storeName, 'local');
 
         $user = \Auth::user();
 
