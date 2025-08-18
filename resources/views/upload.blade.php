@@ -71,7 +71,8 @@
                             </div>
                         @endif
 
-                        <form id="upload-form-sign" action="{{ route('upload.file') }}" method="POST" enctype="multipart/form-data">
+                        <form id="upload-form-sign" action="{{ route('upload.file') }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="signature_page" id="signature_page">
                             <input type="hidden" name="signature_position" id="signature_position">
@@ -83,8 +84,8 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <button type="button" class="btn btn-secondary" id="select-position-btn" style="display: none;"
-                                    data-bs-toggle="modal" data-bs-target="#pdf-modal">
+                                <button type="button" class="btn btn-secondary" id="select-position-btn"
+                                    style="display: none;" data-bs-toggle="modal" data-bs-target="#pdf-modal">
                                     Chọn vị trí ký
                                 </button>
                                 <span id="selected-position-info"></span>
@@ -173,7 +174,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="pdf-viewer" style="overflow: auto; max-height: 75vh; border: 1px solid #ccc;"></div>
+                    <div id="pdf-viewer"
+                        style="overflow-y: scroll;overflow-x: clip;max-height: 75vh;border: 1px solid #ccc;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -189,13 +191,17 @@
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js";
+
+        // Khai báo các biến DOM
         const fileInput = document.getElementById('file_to_sign');
         const selectPosBtn = document.getElementById('select-position-btn');
         const pdfViewer = document.getElementById('pdf-viewer');
         const signaturePageInput = document.getElementById('signature_page');
         const signaturePositionInput = document.getElementById('signature_position');
         const selectedPositionInfo = document.getElementById('selected-position-info');
+        const pdfModal = document.getElementById('pdf-modal'); // Thêm ID modal
 
+        // Khai báo các biến trạng thái
         let pdfDoc = null;
         let selectedPage = null;
         let selectedPosition = null;
@@ -204,98 +210,69 @@
             height: 70
         };
 
+        // Khi người dùng chọn file, hiển thị nút "Chọn vị trí"
         fileInput.addEventListener('change', function(e) {
             if (e.target.files.length > 0) {
                 selectPosBtn.style.display = 'inline-block';
             } else {
                 selectPosBtn.style.display = 'none';
             }
+            // Reset thông tin khi chọn file mới
             selectedPositionInfo.textContent = '';
             signaturePageInput.value = null;
             signaturePositionInput.value = null;
         });
 
-        selectPosBtn.addEventListener('click', function() {
+        // === THAY ĐỔI CHÍNH BẮT ĐẦU ===
+        // Lắng nghe sự kiện KHI MODAL ĐÃ HIỂN THỊ XONG
+        pdfModal.addEventListener('shown.bs.modal', function() {
+            // Toàn bộ logic load và render PDF được chuyển vào đây
             const file = fileInput.files[0];
-            if (!file) return;
+            if (!file) {
+                console.error("Không có file nào được chọn.");
+                return;
+            }
+
+            // Xóa nội dung cũ trước khi render mới
+            pdfViewer.innerHTML = '<div class="text-center">Đang tải tài liệu...</div>';
 
             const fileReader = new FileReader();
             fileReader.onload = function() {
                 const typedarray = new Uint8Array(this.result);
                 pdfjsLib.getDocument(typedarray).promise.then(pdf => {
                     pdfDoc = pdf;
-                    renderAllPages();
+                    renderAllPagesAndHighlight(); // Gọi hàm render chính
+                }, reason => {
+                    console.error("Lỗi khi tải PDF:", reason);
+                    pdfViewer.innerHTML =
+                        '<div class="alert alert-danger">Không thể đọc được file PDF này.</div>';
                 });
             };
             fileReader.readAsArrayBuffer(file);
         });
-
-        function renderAllPages() {
-            pdfViewer.innerHTML = '';
-            for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-                pdfDoc.getPage(pageNum).then(page => {
-                    const canvas = document.createElement('canvas');
-                    canvas.dataset.pageNumber = pageNum;
-                    const context = canvas.getContext('2d');
-                    const viewport = page.getViewport({
-                        scale: 1.5
-                    });
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-
-                    const renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    };
-                    page.render(renderContext);
-                    pdfViewer.appendChild(canvas);
-
-                    canvas.addEventListener('click', function(e) {
-                        selectedPage = parseInt(canvas.dataset.pageNumber);
-                        const rect = canvas.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-
-                        const originalViewport = page.getViewport({
-                            scale: 1
-                        });
-                        let pdfX = (x / viewport.width) * originalViewport.width;
-                        let pdfY = originalViewport.height - (y / viewport.height) * originalViewport
-                            .height;
-
-                        if (pdfX + signatureBoxSize.width > originalViewport.width) {
-                            pdfX = originalViewport.width - signatureBoxSize.width;
-                        }
-
-                        if (pdfY - signatureBoxSize.height < 0) {
-                            pdfY = signatureBoxSize.height;
-                        }
-
-                        const llx = pdfX;
-                        const lly = pdfY - signatureBoxSize.height;
-                        const urx = pdfX + signatureBoxSize.width;
-                        const ury = pdfY;
-
-                        selectedPosition =
-                            `${llx.toFixed(2)},${lly.toFixed(2)},${urx.toFixed(2)},${ury.toFixed(2)}`;
-
-                        // Redraw all pages to clear previous selections
-                        renderAllPagesAndHighlight();
-                    });
-                });
-            }
-        }
+        // Nút "Chọn vị trí ký" bây giờ CHỈ CÓ TÁC DỤNG MỞ MODAL thông qua thuộc tính data-bs-toggle
+        // Toàn bộ logic render đã được chuyển vào sự kiện 'shown.bs.modal' ở trên.
+        // === THAY ĐỔI CHÍNH KẾT THÚC ===
 
         function renderAllPagesAndHighlight() {
-            pdfViewer.innerHTML = '';
+            pdfViewer.innerHTML = ''; // Xóa thông báo "Đang tải"
             for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                 pdfDoc.getPage(pageNum).then(page => {
                     const canvas = document.createElement('canvas');
                     canvas.dataset.pageNumber = pageNum;
-                    const context = canvas.getContext('2d');
-                    const viewport = page.getViewport({
-                        scale: 1.5
+                    const context = canvas.getContext('2d', {
+                        willReadFrequently: true
                     });
+
+                    const containerWidth = pdfViewer.clientWidth;
+                    const originalViewportForScale = page.getViewport({
+                        scale: 1
+                    });
+                    const scale = containerWidth / originalViewportForScale.width;
+                    const viewport = page.getViewport({
+                        scale: scale
+                    });
+
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
 
@@ -309,23 +286,38 @@
                             const originalViewport = page.getViewport({
                                 scale: 1
                             });
-                            const x = parseFloat(pos[0]) * viewport.width / originalViewport.width;
-                            const y = (originalViewport.height - parseFloat(pos[3])) * viewport.height /
+
+                            // Logic vẽ highlight không đổi
+                            const llx_render = parseFloat(pos[0]);
+                            const lly_render = parseFloat(pos[1]);
+                            const urx_render = parseFloat(pos[2]);
+                            const ury_render = parseFloat(pos[3]);
+
+                            const x = llx_render * viewport.width / originalViewport.width;
+                            const y = (originalViewport.height - ury_render) * viewport.height /
                                 originalViewport.height;
-                            const width = signatureBoxSize.width * viewport.width / originalViewport.width;
-                            const height = signatureBoxSize.height * viewport.height / originalViewport
+                            const width = (urx_render - llx_render) * viewport.width / originalViewport
+                                .width;
+                            const height = (ury_render - lly_render) * viewport.height / originalViewport
                                 .height;
 
                             context.strokeStyle = 'red';
                             context.lineWidth = 2;
                             context.strokeRect(x, y, width, height);
+
+                            pdfViewer.scrollTo({
+                                top: canvas.offsetTop,
+                                behavior: 'smooth'
+                            });
                         }
                     });
 
                     pdfViewer.appendChild(canvas);
 
+                    // Gắn lại sự kiện click cho canvas mới
                     canvas.addEventListener('click', function(e) {
                         selectedPage = parseInt(canvas.dataset.pageNumber);
+
                         const rect = canvas.getBoundingClientRect();
                         const x = e.clientX - rect.left;
                         const y = e.clientY - rect.top;
@@ -333,33 +325,42 @@
                         const originalViewport = page.getViewport({
                             scale: 1
                         });
-                        let pdfX = (x / viewport.width) * originalViewport.width;
-                        let pdfY = originalViewport.height - (y / viewport.height) * originalViewport
-                            .height;
 
-                        if (pdfX + signatureBoxSize.width > originalViewport.width) {
-                            pdfX = originalViewport.width - signatureBoxSize.width;
+                        let pdfX = (x / rect.width) * originalViewport.width;
+                        let pdfY = originalViewport.height - ((y / rect.height) * originalViewport.height);
+
+                        // === THAY ĐỔI LOGIC: LẤY VỊ TRÍ CLICK LÀM TÂM ===
+                        const halfWidth = signatureBoxSize.width / 2;
+                        const halfHeight = signatureBoxSize.height / 2;
+
+                        // 1. Cập nhật logic kiểm tra biên để hộp không bị tràn
+                        if (pdfX - halfWidth < 0) {
+                            pdfX = halfWidth;
+                        }
+                        if (pdfX + halfWidth > originalViewport.width) {
+                            pdfX = originalViewport.width - halfWidth;
+                        }
+                        if (pdfY - halfHeight < 0) {
+                            pdfY = halfHeight;
+                        }
+                        if (pdfY + halfHeight > originalViewport.height) {
+                            pdfY = originalViewport.height - halfHeight;
                         }
 
-                        if (pdfY - signatureBoxSize.height < 0) {
-                            pdfY = signatureBoxSize.height;
-                        }
-
-                        const llx = pdfX;
-                        const lly = pdfY - signatureBoxSize.height;
-                        const urx = pdfX + signatureBoxSize.width;
-                        const ury = pdfY;
+                        // 2. Tính toán tọa độ các góc từ tâm (pdfX, pdfY)
+                        const llx = pdfX - halfWidth;
+                        const lly = pdfY - halfHeight;
+                        const urx = pdfX + halfWidth;
+                        const ury = pdfY + halfHeight;
+                        // === KẾT THÚC THAY ĐỔI LOGIC ===
 
                         selectedPosition =
                             `${llx.toFixed(2)},${lly.toFixed(2)},${urx.toFixed(2)},${ury.toFixed(2)}`;
-
-                        // Redraw all pages to clear previous selections
                         renderAllPagesAndHighlight();
                     });
                 });
             }
         }
-
 
         document.getElementById('save-position-btn').addEventListener('click', function() {
             if (selectedPage && selectedPosition) {
@@ -371,8 +372,9 @@
 
         document.querySelector('#upload-form-sign').addEventListener('submit', function(e) {
             if (!signaturePositionInput.value) {
-                e.preventDefault();
-                alert('Vui lòng chọn vị trí ký');
+                // Bạn có thể bật lại tính năng này nếu muốn bắt buộc chọn vị trí
+                // e.preventDefault();
+                // alert('Vui lòng chọn vị trí ký');
             }
         });
     </script>
