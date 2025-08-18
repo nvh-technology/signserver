@@ -1,2 +1,5 @@
 *
 !.gitignore
+
+!rssp_sdk/
+!rssp_sdk/**
