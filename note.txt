@@ -7,8 +7,8 @@ Deployment Commands for SignServer:
    php artisan migrate
 
 3. Seed roles and permissions (this will create 'admin' and 'user' roles, define permissions, and assign the 'admin' role to the user with ID 1):
-   php artisan db:seed --class=RolesAndPermissionsSeeder
-
+   php artisan db:seed
+   
 4. Clear application caches:
    php artisan optimize:clear
 

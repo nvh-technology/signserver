@@ -84,6 +84,14 @@
                                 </div>
                             </div>
                             <div class="mb-3">
+                                <label for="reason" class="form-label">Lý do ký</label>
+                                <input type="text" class="form-control" id="reason" name="reason" value="Ký hợp đồng điện tử">
+                            </div>
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Nơi ký</label>
+                                <input type="text" class="form-control" id="location" name="location" value="Hồ Chí Minh">
+                            </div>
+                            <div class="mb-3">
                                 <button type="button" class="btn btn-secondary" id="select-position-btn"
                                     style="display: none;" data-bs-toggle="modal" data-bs-target="#pdf-modal">
                                     Chọn vị trí ký

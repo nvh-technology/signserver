@@ -40,7 +40,15 @@ class UploadController extends Controller
                 ->first();
         }
 
-        [$status, $signedFilePath] = RSSPHelper::signPDF($path, $ownerUser, $request->input('signature_page'), $request->input('signature_position'));
+        [$status, $signedFilePath] = RSSPHelper::signPDF(
+            $path,
+            $ownerUser,
+            $request->input('signature_page'),
+            $request->input('signature_position'),
+            $request->input('reason'),
+            $request->input('location'),
+            $user->background_signature
+        );
         $signedFilePath = $signedFilePath == "" ? null : $signedFilePath;
         if ($status && $signedFilePath) {
             return response()->download($signedFilePath, 'signed.' . $fileName);

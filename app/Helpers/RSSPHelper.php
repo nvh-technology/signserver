@@ -10,7 +10,7 @@ use Storage;
 
 class RSSPHelper
 {
-    public static function signPDF($fileToSign, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null)
+    public static function signPDF($fileToSign, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null)
     {
         $sdkDirectory = storage_path(env("RSSP_SDK_DIRECTORY", 'app/private/rssp_sdk'));
         $sdkName = env("RSSP_SDK_NAME", 'rssp_sdk.exe');
@@ -54,6 +54,18 @@ class RSSPHelper
         if ($signaturePage && $signaturePosition) {
             $cmd .= ' --page "' . $signaturePage . '"';
             $cmd .= ' --position "' . $signaturePosition . '"';
+        }
+
+        if ($reason) {
+            $cmd .= ' --reason "' . $reason . '"';
+        }
+
+        if ($location) {
+            $cmd .= ' --location "' . $location . '"';
+        }
+
+        if ($backgroundSignature) {
+            $cmd .= ' --backgroundPath "' . Storage::disk('local')->path($backgroundSignature) . '"';
         }
 
         $result = Process::path($sdkDirectory)->run($cmd);
