@@ -1,4 +1,6 @@
 *
 !private/
+!private/rssp_sdk/
+!private/rssp_sdk/**
 !public/
 !.gitignore
