@@ -15,6 +15,9 @@ public/hot
 public_html/storage
 public_html/hot
 
+!storage/app/private/rssp_sdk/
+!storage/app/private/rssp_sdk/**
+
 storage/*.key
 .env
 Homestead.yaml
