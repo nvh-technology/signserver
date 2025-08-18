@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+    <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="mb-3">
@@ -29,6 +29,16 @@
         <div class="mb-3">
             <label for="password" class="form-label">Password (leave blank to keep current)</label>
             <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <div class="mb-3">
+            <label for="backgroundSignature" class="form-label">Background Signature (PNG only)</label>
+            <input type="file" class="form-control" id="backgroundSignature" name="backgroundSignature" accept=".png">
+            @if ($user->backgroundSignature)
+                <div class="mt-2">
+                    <p>Current background:</p>
+                    <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Background Signature" width="150">
+                </div>
+            @endif
         </div>
 
         <div class="mb-3">

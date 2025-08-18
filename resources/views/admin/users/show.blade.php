@@ -18,6 +18,17 @@
         </div>
     </div>
 
+    @if ($user->backgroundSignature)
+        <div class="card mb-3">
+            <div class="card-header">
+                Background Signature
+            </div>
+            <div class="card-body">
+                <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Background Signature" class="img-fluid">
+            </div>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header">
             Assigned Owners

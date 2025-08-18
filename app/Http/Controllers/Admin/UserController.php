@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Owner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -44,6 +45,7 @@ class UserController extends Controller
             'owner_pivot.*.userName' => 'nullable|string',
             'owner_pivot.*.passcode' => 'nullable|string',
             'owner_pivot.*.credentialID' => 'nullable|string',
+            'backgroundSignature' => 'nullable|image|mimes:png|max:2048',
         ]);
 
         $request->validate([
@@ -68,6 +70,12 @@ class UserController extends Controller
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
         ]);
+
+        if ($request->hasFile('backgroundSignature')) {
+            $path = $request->file('backgroundSignature')->store('backgrounds');
+            $user->backgroundSignature = $path;
+            $user->save();
+        }
 
         if (isset($validatedData['owners'])) {
             $syncData = [];
@@ -119,6 +127,7 @@ class UserController extends Controller
             'owner_pivot.*.userName' => 'nullable|string',
             'owner_pivot.*.passcode' => 'nullable|string',
             'owner_pivot.*.credentialID' => 'nullable|string',
+            'backgroundSignature' => 'nullable|image|mimes:png|max:2048',
         ]);
 
         $request->validate([
@@ -144,6 +153,16 @@ class UserController extends Controller
         if ($request->filled('password')) {
             $user->password = bcrypt($validatedData['password']);
         }
+
+        if ($request->hasFile('backgroundSignature')) {
+            // Delete old background if it exists
+            if ($user->backgroundSignature) {
+                Storage::disk('local')->delete($user->backgroundSignature);
+            }
+            $path = $request->file('backgroundSignature')->store('backgrounds');
+            $user->backgroundSignature = $path;
+        }
+
         $user->save();
 
         if (isset($validatedData['owners'])) {
@@ -191,5 +210,14 @@ class UserController extends Controller
         $user->syncRoles($request->roles);
 
         return redirect()->route('admin.users.index')->with('success', 'User roles updated successfully.');
+    }
+
+    public function backgroundSignature(User $user)
+    {
+        if ($user->backgroundSignature && Storage::disk('local')->exists($user->backgroundSignature)) {
+            return response()->file(Storage::disk('local')->path($user->backgroundSignature));
+        }
+
+        abort(404);
     }
 }

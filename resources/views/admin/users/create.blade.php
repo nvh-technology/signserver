@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.users.store') }}" method="POST">
+    <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
@@ -28,6 +28,10 @@
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label for="backgroundSignature" class="form-label">Background Signature (PNG only)</label>
+            <input type="file" class="form-control" id="backgroundSignature" name="backgroundSignature" accept=".png">
         </div>
 
         <div class="mb-3">

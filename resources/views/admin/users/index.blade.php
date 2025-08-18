@@ -22,6 +22,7 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Background Signature</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -31,6 +32,11 @@
                     <td>{{ $user->id }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
+                    <td>
+                        @if ($user->backgroundSignature)
+                            <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Background Signature" width="100">
+                        @endif
+                    </td>
                     <td>
                         <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info">View</a>
                         @can('manage users')
@@ -46,7 +52,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">No users found.</td>
+                    <td colspan="5">No users found.</td>
                 </tr>
             @endforelse
         </tbody>

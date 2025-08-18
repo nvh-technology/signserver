@@ -112,12 +112,15 @@ namespace RSSPAPI
                 Console.WriteLine("  --filePDF: Path to the PDF file to be signed.");
                 Console.WriteLine("  --signedsPath: Path to the save PDF file signed.");
                 Console.WriteLine("  --keystoreFile: Path to the keystore file.");
+                Console.WriteLine("=======================================");
                 Console.WriteLine("  --reason: Reason for signing (default: \"Ký hợp đồng điện tử\").");
                 Console.WriteLine("  --location: Location of signing (default: \"Hồ Chí Minh\").");
                 Console.WriteLine("  --backgroundPath: Path to the background image for signature (default: \"Signature.png\").");
+                Console.WriteLine("=======================================");
                 Console.WriteLine("  --offset: X,Y coordinates for visible signature (default: \"-30,-100\").");
                 Console.WriteLine("  --boxSize: Width,Height for visible signature box (default: \"170,70\").");
                 Console.WriteLine("  --titleText: Title text for visible signature (default: \"DIGITAL SIGNATURE\").");
+                Console.WriteLine("=======================================");
                 Console.WriteLine("  --page: Page number for the visible signature.");
                 Console.WriteLine("  --position: Coordinates for the visible signature (format: llx,lly,urx,ury).");
                 return;

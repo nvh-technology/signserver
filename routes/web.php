@@ -24,6 +24,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () { 
     Route::resource('users', UserController::class)->names('admin.users');
     Route::get('users/{user}/roles/edit', [UserController::class, 'editRoles'])->name('admin.users.editRoles')->middleware('permission:manage users');
     Route::put('users/{user}/roles', [UserController::class, 'updateRoles'])->name('admin.users.updateRoles')->middleware('permission:manage users');
+    Route::get('users/{user}/background-signature', [UserController::class, 'backgroundSignature'])->name('admin.users.backgroundSignature');
 
     // Role Management Routes
     Route::resource('roles', RoleController::class)->names('admin.roles')->middleware('permission:manage roles');
