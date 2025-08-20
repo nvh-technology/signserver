@@ -41,7 +41,8 @@
                             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                                 <ul class="navbar-nav">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('profile.edit') }}">Profile</a>
+                                        <a class="nav-link"
+                                            href="{{ route('profile.edit') }}">{{ request()->user()->name }}</a>
                                     </li>
                                     <li class="nav-item">
                                         <form method="POST" action="{{ route('logout') }}">

@@ -77,19 +77,19 @@
                             <input type="hidden" name="signature_page" id="signature_page">
                             <input type="hidden" name="signature_position" id="signature_position">
                             <div class="mb-3">
+                                <label for="file_to_sign" class="form-label">File cần ký</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="file_to_sign" name="file_to_sign" required
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="owner_id" class="form-label">Tổ chức</label>
                                 <select class="form-select" id="owner_id" name="owner_id" required>
                                     @foreach($owners as $owner)
                                         <option value="{{ $owner->id }}">{{ $owner->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="file_to_sign" class="form-label">File cần ký</label>
-                                <div class="input-group">
-                                    <input type="file" class="form-control" id="file_to_sign" name="file_to_sign" required
-                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-                                </div>
                             </div>
                             <div id="pdf-options">
                                 <div class="mb-3">

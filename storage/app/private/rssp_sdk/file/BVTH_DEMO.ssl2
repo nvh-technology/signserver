@@ -1,0 +1,7 @@
+baseurl=https://113.161.43.188:22443/rssp/v2/
+name=BVTH_DEMO
+user=BVTH_DEMO
+password=MSS5M9yf
+signature=FQ5sqkc7IgeGJ88YXtiu31aeqREBsRsWrvRXopDzGGFThHuLly+EdP1FEXZu0njqewg4K7rcmFp8dZjEoV9o2pPetJrSTeYjDrIdj9Xww8ytp9NG6jFW08XlDNRKnOPvY3sLZZvDehMgEx9u8ukAHrABV3VeA3nZavaaoONh1dMOq+3x6gKJTks2B0TkBe5QzNN3Tk+DhFwbu5wf6TfNBtf57aHbEPX23/T//3WKkvDZ/f/uf/PTrdQY6e5kD5rbiU7LfbLva7se+G1OfXKRxPPI+jRauZ8RQW4tm8wuk8dTZqoPtRW++RHeWrVzhpbmuQWBNb6ryY/VObqLpeI30Q==
+keystore.file=BVTH_DEMO.p12
+keystore.password=QK7uHgSz

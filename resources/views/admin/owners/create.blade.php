@@ -27,7 +27,7 @@
         </div>
         <div class="mb-3">
             <label for="keystoreFile" class="form-label">Keystore File</label>
-            <input type="file" class="form-control" id="keystoreFile" name="keystoreFile">
+            <input type="file" class="form-control" id="keystoreFile" name="keystoreFile" required>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
         <a href="{{ route('admin.owners.index') }}" class="btn btn-secondary">Cancel</a>

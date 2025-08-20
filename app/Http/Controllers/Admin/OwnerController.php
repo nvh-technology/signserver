@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Owner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class OwnerController extends Controller
 {
@@ -35,20 +36,25 @@ class OwnerController extends Controller
         $request->validate([
             'name' => 'required|string',
             'fileConfig' => 'required|file',
-            'keystoreFile' => 'nullable|file',
+            'keystoreFile' => 'required|file',
         ]);
 
         $owner = new Owner();
         $owner->name = $request->name;
 
         if ($request->hasFile('fileConfig')) {
-            $path = $request->file('fileConfig')->store('owners');
+            $file = $request->file('fileConfig');
+            $extension = $file->getClientOriginalExtension();
+            $randomName = Str::random(40) . '.' . $extension;
+            $path = $file->storeAs('owners', $randomName);
             $owner->fileConfig = $path;
         }
 
-        // Handle keystoreFile upload
         if ($request->hasFile('keystoreFile')) {
-            $path = $request->file('keystoreFile')->store('owners');
+            $file = $request->file('keystoreFile');
+            $extension = $file->getClientOriginalExtension();
+            $randomName = Str::random(40) . '.' . $extension;
+            $path = $file->storeAs('owners', $randomName);
             $owner->keystoreFile = $path;
         }
 
@@ -104,7 +110,10 @@ class OwnerController extends Controller
             if ($owner->fileConfig) {
                 Storage::disk('local')->delete($owner->fileConfig);
             }
-            $path = $request->file('fileConfig')->store('owners');
+            $file = $request->file('fileConfig');
+            $extension = $file->getClientOriginalExtension();
+            $randomName = Str::random(40) . '.' . $extension;
+            $path = $file->storeAs('owners', $randomName);
             $owner->fileConfig = $path;
         }
 
@@ -114,7 +123,10 @@ class OwnerController extends Controller
             if ($owner->keystoreFile) {
                 Storage::disk('local')->delete($owner->keystoreFile);
             }
-            $path = $request->file('keystoreFile')->store('owners');
+            $file = $request->file('keystoreFile');
+            $extension = $file->getClientOriginalExtension();
+            $randomName = Str::random(40) . '.' . $extension;
+            $path = $file->storeAs('owners', $randomName);
             $owner->keystoreFile = $path;
         }
 
