@@ -42,17 +42,13 @@ class OwnerController extends Controller
         $owner->name = $request->name;
 
         if ($request->hasFile('fileConfig')) {
-            $file = $request->file('fileConfig');
-            $fileName = $file->getClientOriginalName();
-            $path = $file->storeAs('owners', $fileName, 'local');
+            $path = $request->file('fileConfig')->store('owners');
             $owner->fileConfig = $path;
         }
 
         // Handle keystoreFile upload
         if ($request->hasFile('keystoreFile')) {
-            $file = $request->file('keystoreFile');
-            $fileName = $file->getClientOriginalName();
-            $path = $file->storeAs('owners', $fileName, 'local');
+            $path = $request->file('keystoreFile')->store('owners');
             $owner->keystoreFile = $path;
         }
 
@@ -108,9 +104,7 @@ class OwnerController extends Controller
             if ($owner->fileConfig) {
                 Storage::disk('local')->delete($owner->fileConfig);
             }
-            $file = $request->file('fileConfig');
-            $fileName = $file->getClientOriginalName();
-            $path = $file->storeAs('owners', $fileName, 'local');
+            $path = $request->file('fileConfig')->store('owners');
             $owner->fileConfig = $path;
         }
 
@@ -120,9 +114,7 @@ class OwnerController extends Controller
             if ($owner->keystoreFile) {
                 Storage::disk('local')->delete($owner->keystoreFile);
             }
-            $file = $request->file('keystoreFile');
-            $fileName = $file->getClientOriginalName();
-            $path = $file->storeAs('owners', $fileName, 'local');
+            $path = $request->file('keystoreFile')->store('owners');
             $owner->keystoreFile = $path;
         }
 

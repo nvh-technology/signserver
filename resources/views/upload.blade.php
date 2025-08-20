@@ -77,26 +77,36 @@
                             <input type="hidden" name="signature_page" id="signature_page">
                             <input type="hidden" name="signature_position" id="signature_position">
                             <div class="mb-3">
+                                <label for="owner_id" class="form-label">Tổ chức</label>
+                                <select class="form-select" id="owner_id" name="owner_id" required>
+                                    @foreach($owners as $owner)
+                                        <option value="{{ $owner->id }}">{{ $owner->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label for="file_to_sign" class="form-label">File cần ký</label>
                                 <div class="input-group">
                                     <input type="file" class="form-control" id="file_to_sign" name="file_to_sign" required
-                                        accept=".pdf">
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="reason" class="form-label">Lý do ký</label>
-                                <input type="text" class="form-control" id="reason" name="reason" value="Ký hợp đồng điện tử">
-                            </div>
-                            <div class="mb-3">
-                                <label for="location" class="form-label">Nơi ký</label>
-                                <input type="text" class="form-control" id="location" name="location" value="Hồ Chí Minh">
-                            </div>
-                            <div class="mb-3">
-                                <button type="button" class="btn btn-secondary" id="select-position-btn"
-                                    style="display: none;" data-bs-toggle="modal" data-bs-target="#pdf-modal">
-                                    Chọn vị trí ký
-                                </button>
-                                <span id="selected-position-info"></span>
+                            <div id="pdf-options">
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Lý do ký</label>
+                                    <input type="text" class="form-control" id="reason" name="reason" value="Ký hợp đồng điện tử">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Nơi ký</label>
+                                    <input type="text" class="form-control" id="location" name="location" value="Hồ Chí Minh">
+                                </div>
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-secondary" id="select-position-btn"
+                                        style="display: none;" data-bs-toggle="modal" data-bs-target="#pdf-modal">
+                                        Chọn vị trí ký
+                                    </button>
+                                    <span id="selected-position-info"></span>
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2">
@@ -218,11 +228,20 @@
             height: 70
         };
 
-        // Khi người dùng chọn file, hiển thị nút "Chọn vị trí"
         fileInput.addEventListener('change', function(e) {
+            const pdfOptions = document.getElementById('pdf-options');
             if (e.target.files.length > 0) {
-                selectPosBtn.style.display = 'inline-block';
+                const fileName = e.target.files[0].name;
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+                if (fileExtension === 'pdf') {
+                    pdfOptions.style.display = 'block';
+                    selectPosBtn.style.display = 'inline-block';
+                } else {
+                    pdfOptions.style.display = 'none';
+                    selectPosBtn.style.display = 'none';
+                }
             } else {
+                pdfOptions.style.display = 'block';
                 selectPosBtn.style.display = 'none';
             }
             // Reset thông tin khi chọn file mới
