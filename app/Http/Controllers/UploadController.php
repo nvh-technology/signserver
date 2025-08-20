@@ -41,7 +41,7 @@ class UploadController extends Controller
                 ->first();
         }
 
-        [$status, $signedFilePath] = RSSPHelper::signPDF(
+         [$status, $signedFilePath] = RSSPHelper::signPDF(
             $path,
             $ownerUser,
             $request->input('signature_page'),

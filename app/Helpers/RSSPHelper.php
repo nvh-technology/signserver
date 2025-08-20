@@ -37,15 +37,14 @@ class RSSPHelper
         //     // '--location' => 'Hà Nội',
         // ];
 
-        // if ($ownerUser->userName) {
-        //     $args['--userID'] = $ownerUser->userName;
-        // }
-        // if ($ownerUser->credentialID) {
-        //     $args['--credentialID'] = $ownerUser->credentialID;
-        // }
         $cmd = $sdkName;
         $cmd .= ' --fileConfig "' . Storage::disk('local')->path($ownerUser->owner->fileConfig) . '"';
-        $cmd .= ' --userID "' . $ownerUser->userName . '"';
+        if ($ownerUser->userName) {
+            $cmd .= ' --userID "' . $ownerUser->userName . '"';
+        }
+        if ($ownerUser->credentialID) {
+            $cmd .= ' --credentialID "' . $ownerUser->credentialID . '"';
+        }
         $cmd .= ' --passCode "' . $ownerUser->passcode . '"';
         $cmd .= ' --filePDF "' . $fileToSignPath . '"';
         $cmd .= ' --keystoreFile "' . Storage::disk('local')->path($ownerUser->owner->keystoreFile) . '"';
@@ -67,7 +66,7 @@ class RSSPHelper
         if ($backgroundSignature) {
             $cmd .= ' --backgroundPath "' . Storage::disk('local')->path($backgroundSignature) . '"';
         }
-
+        // return [true, $cmd];
         $result = Process::path($sdkDirectory)->run($cmd);
         // rssp_sdk.exe --fileConfig "BVTH_DEMO.ssl2" --userID "USERNAME:202506100930" --passCode "12345678" --filePDF "sample.pdf"
 
