@@ -51,7 +51,7 @@ class UploadController extends Controller
         }
 
         // 2. Call the helper to sign the file
-        return [$status, $result] = RSSPHelper::signFile(
+        [$status, $result] = RSSPHelper::signFile(
             $originalFilePath,
             $extension,
             $ownerUser,

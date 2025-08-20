@@ -74,7 +74,12 @@ class RSSPHelper
 
         // --- Execute the command ---
         $result = Process::path($sdkDirectory)->run($cmd);
-        $xxxx = $result->output();
+        // $xxxx = $result->output();
+        // echo $xxxx;
+        // echo '<br>=========<br>';
+        // echo $cmd;
+        // dd();
+        // return [true, $xxxx];
         // --- Process the result ---
         if ($result->successful()) {
             $output = $result->output();

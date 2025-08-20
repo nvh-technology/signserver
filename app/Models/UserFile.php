@@ -9,6 +9,7 @@ class UserFile extends Model
     protected $fillable = [
         'user_id',
         'owner_id',
+        'original_file_name',
         'original_file_path',
         'signed_file_path',
     ];
