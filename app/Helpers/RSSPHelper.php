@@ -36,10 +36,8 @@ class RSSPHelper
 
         // --- Build the command ---
         $cmd = $sdkName;
-        $cmd .= ' --fileConfig "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.ssl2"';
-        $cmd .= ' --keystoreFile "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.p12"';
-        // $cmd .= ' --fileConfig "' . Storage::disk('local')->path($ownerUser->owner->fileConfig) . '"';
-        // $cmd .= ' --keystoreFile "' . Storage::disk('local')->path($ownerUser->owner->keystoreFile) . '"';
+        $cmd .= ' --fileConfig "' . Storage::disk('local')->path($ownerUser->owner->fileConfig) . '"';
+        $cmd .= ' --keystoreFile "' . Storage::disk('local')->path($ownerUser->owner->keystoreFile) . '"';
         $cmd .= ' --passCode "' . $ownerUser->passcode . '"';
         $cmd .= ' --signedsPath "' . $signedDocumentsPath . '"';
 
@@ -74,43 +72,10 @@ class RSSPHelper
             }
         }
 
-        $args = [
-            $sdkName,
-            '--fileConfig' => "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.ssl2",
-            '--keystoreFile' => "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.p12",
-            '--passCode' => $ownerUser->passcode,
-            '--signedsPath' => $signedDocumentsPath,
-        ];
-
-        if ($ownerUser->userName) {
-            $args['--userID'] = $ownerUser->userName;
-        }
-        if ($ownerUser->credentialID) {
-            $args['--credentialID'] = $ownerUser->credentialID;
-        }
-
-
-        // Add file-specific argument
-        if ($fileExtension === 'pdf') {
-            $args['--filePDF'] = $fileToSignPath;
-            $args['--page'] = $signaturePage;
-            $args['--position'] = $signaturePosition;
-            $args['--reason'] = $reason;
-            $args['--location'] = $location;
-            $args['--backgroundPath'] = Storage::disk('local')->path($backgroundSignature);
-        } else {
-            $args['--fileOffice'] = $fileToSignPath;
-        }
-
         // --- Execute the command ---
         $result = Process::path($sdkDirectory)->run($cmd);
         $xxxx = $result->output();
         // --- Process the result ---
-
-        $result = Process::path($sdkDirectory)->run($args);
-        $yyyyyyyy = $result->output();
-        $zzzzzzzzzzzz = $result->command();
-        $cccc = $result->errorOutput();
         if ($result->successful()) {
             $output = $result->output();
             $signedFilePath = null;

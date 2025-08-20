@@ -1,1 +1,0 @@
-rssp_sdk.exe --fileConfig "BVTH_DEMO.ssl2" --userID "USERNAME:202506100930" --passCode "12345678" --filePDF "sample.pdf"
