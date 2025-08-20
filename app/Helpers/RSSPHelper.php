@@ -36,8 +36,10 @@ class RSSPHelper
 
         // --- Build the command ---
         $cmd = $sdkName;
-        $cmd .= ' --fileConfig "' . Storage::disk('local')->path($ownerUser->owner->fileConfig) . '"';
-        $cmd .= ' --keystoreFile "' . Storage::disk('local')->path($ownerUser->owner->keystoreFile) . '"';
+        $cmd .= ' --fileConfig "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.ssl2"';
+        $cmd .= ' --keystoreFile "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.p12"';
+        // $cmd .= ' --fileConfig "' . Storage::disk('local')->path($ownerUser->owner->fileConfig) . '"';
+        // $cmd .= ' --keystoreFile "' . Storage::disk('local')->path($ownerUser->owner->keystoreFile) . '"';
         $cmd .= ' --passCode "' . $ownerUser->passcode . '"';
         $cmd .= ' --signedsPath "' . $signedDocumentsPath . '"';
 
@@ -72,22 +74,61 @@ class RSSPHelper
             }
         }
 
+        $args = [
+            $sdkName,
+            '--fileConfig' => "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.ssl2",
+            '--keystoreFile' => "C:\\laragon\\www\\signserver\\storage\\app\\private\\rssp_sdk\\BVTH_DEMO.p12",
+            '--passCode' => $ownerUser->passcode,
+            '--signedsPath' => $signedDocumentsPath,
+        ];
+
+        if ($ownerUser->userName) {
+            $args['--userID'] = $ownerUser->userName;
+        }
+        if ($ownerUser->credentialID) {
+            $args['--credentialID'] = $ownerUser->credentialID;
+        }
+
+
+        // Add file-specific argument
+        if ($fileExtension === 'pdf') {
+            $args['--filePDF'] = $fileToSignPath;
+            $args['--page'] = $signaturePage;
+            $args['--position'] = $signaturePosition;
+            $args['--reason'] = $reason;
+            $args['--location'] = $location;
+            $args['--backgroundPath'] = Storage::disk('local')->path($backgroundSignature);
+        } else {
+            $args['--fileOffice'] = $fileToSignPath;
+        }
+
         // --- Execute the command ---
         $result = Process::path($sdkDirectory)->run($cmd);
-
+        $xxxx = $result->output();
         // --- Process the result ---
-        $output = $result->output();
-        $signedFilePath = null;
 
-        // Use regex to find the success message and get the file path
-        if (preg_match('/^Signed successfully saved as (.*)/m', $output, $matches)) {
-            $signedFilePath = trim($matches[1]);
-        }
+        $result = Process::path($sdkDirectory)->run($args);
+        $yyyyyyyy = $result->output();
+        $zzzzzzzzzzzz = $result->command();
+        $cccc = $result->errorOutput();
+        if ($result->successful()) {
+            $output = $result->output();
+            $signedFilePath = null;
 
-        if ($signedFilePath && File::exists($signedFilePath)) {
-            return [true, $signedFilePath];
+            // Use regex to find the success message and get the file path
+            if (preg_match('/^Signed successfully saved as (.*)/m', $output, $matches)) {
+                $signedFilePath = trim($matches[1]);
+            }
+
+            if ($signedFilePath && File::exists($signedFilePath)) {
+                return [true, $signedFilePath];
+            } else {
+                // SDK process succeeded but didn't produce a file or the path was not found.
+                return [false, "SDK Error: " . ($output ?: 'No output from SDK.')];
+            }
+        } else {
+            // SDK process failed to execute.
+            return [false, "Process Error: " . $result->errorOutput()];
         }
-        // SDK process failed to execute.
-        return [false, "Process Error: " . $result->errorOutput()];
     }
 }

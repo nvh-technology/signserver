@@ -32,7 +32,7 @@ class UploadController extends Controller
     {
         // 1. Validate the uploaded file and owner selection
         $request->validate([
-            'file_to_sign' => 'required|mimes:pdf,doc,docx,xls,xlsx|max:10240', // Max 10MB
+            'file_to_sign' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // Max 10MB
             'owner_id' => 'required|exists:owners,id',
         ]);
 
@@ -51,7 +51,7 @@ class UploadController extends Controller
         }
 
         // 2. Call the helper to sign the file
-        [$status, $result] = RSSPHelper::signFile(
+        return [$status, $result] = RSSPHelper::signFile(
             $originalFilePath,
             $extension,
             $ownerUser,
@@ -59,7 +59,7 @@ class UploadController extends Controller
             $request->input('signature_position'),
             $request->input('reason'),
             $request->input('location'),
-            $user->background_signature
+            $user->backgroundSignature
         );
 
         // 3. Handle the result

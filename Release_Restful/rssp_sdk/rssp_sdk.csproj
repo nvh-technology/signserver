@@ -50,7 +50,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\..\..\..\..\..\Mini HSM\Source\Csharp_BVHH_dotNetCore\Csharp_BVHH_dotNetCore\lib\BouncyCastle.Crypto.dll</HintPath>
+      <HintPath>lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="itextsharp">
       <HintPath>lib\itextsharp.dll</HintPath>
