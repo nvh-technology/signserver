@@ -59,15 +59,15 @@
                     <h6 class="card-title">Details for {{ $owner->name }}</h6>
                     <div class="mb-3">
                         <label for="userName_{{ $owner->id }}" class="form-label">User Name:</label>
-                        <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][userName]" id="userName_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.userName', $pivotData ? $pivotData->userName : '') }}">
+                        <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][userName]" id="userName_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.userName', $pivotData ? $pivotData->userName : '') }}" autocomplete="off">
                     </div>
                     <div class="mb-3">
                         <label for="passcode_{{ $owner->id }}" class="form-label">Passcode:</label>
-                        <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][passcode]" id="passcode_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.passcode', $pivotData ? $pivotData->passcode : '') }}">
+                        <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][passcode]" id="passcode_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.passcode', $pivotData ? $pivotData->passcode : '') }}" autocomplete="off">
                     </div>
                     <div class="mb-3">
                         <label for="credentialID_{{ $owner->id }}" class="form-label">Credential ID:</label>
-                        <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][credentialID]" id="credentialID_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.credentialID', $pivotData ? $pivotData->credentialID : '') }}">
+                        <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][credentialID]" id="credentialID_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.credentialID', $pivotData ? $pivotData->credentialID : '') }}" autocomplete="off">
                     </div>
                 </div>
                 @endforeach
