@@ -134,7 +134,7 @@ namespace RSSPAPI
 
             if (!string.IsNullOrEmpty(filePDF) && !string.IsNullOrEmpty(fileOffice))
             {
-                Console.WriteLine("Error: --filePDF and --fileOffice cannot be used at the same time.");
+                Console.Error.WriteLine("Error: --filePDF and --fileOffice cannot be used at the same time.");
                 return;
             }
 
@@ -156,7 +156,7 @@ namespace RSSPAPI
                     }
                     else
                     {
-                        Console.WriteLine("No certificates found for the given User ID. Please provide a valid --userID or --credentialID.");
+                        Console.Error.WriteLine("No certificates found for the given User ID. Please provide a valid --userID or --credentialID.");
                         return; // Exit if no certificates
                     }
                 }
@@ -164,6 +164,11 @@ namespace RSSPAPI
                 // Step 3: certificateInfo
                 crt = session.certificateInfo(credentialID);
                 BaseCertificateInfo info = crt.baseCredentialInfo();
+                if (info.certificates == null)
+                {
+                    Console.Error.WriteLine("No certificates found.");
+                    return;
+                }
                 certChain = info.certificates[0];
                 Console.WriteLine($"Certificate chain obtained: {certChain}");
 
@@ -263,7 +268,7 @@ namespace RSSPAPI
                     }
                 }
             } catch (Exception ex) {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.Error.WriteLine($"An error occurred: {ex.Message}");
                 Console.WriteLine(ex.StackTrace);
                 Environment.Exit(1);
             }
