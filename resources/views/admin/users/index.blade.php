@@ -21,6 +21,7 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Username</th>
                 <th>Email</th>
                 <th>Background Signature</th>
                 <th>Actions</th>
@@ -31,6 +32,7 @@
                 <tr>
                     <td>{{ $user->id }}</td>
                     <td>{{ $user->name }}</td>
+                    <td>{{ $user->username }}</td>
                     <td>{{ $user->email }}</td>
                     <td>
                         @if ($user->backgroundSignature)
@@ -52,7 +54,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">No users found.</td>
+                    <td colspan="6">No users found.</td>
                 </tr>
             @endforelse
         </tbody>

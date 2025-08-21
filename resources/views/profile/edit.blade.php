@@ -42,8 +42,16 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="username" class="form-label">{{ __('Username') }}</label>
+                                <input id="username" name="username" type="text" class="form-control" value="{{ old('username', $user->username) }}" required autocomplete="username">
+                                @error('username')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="email" class="form-label">{{ __('Email') }}</label>
-                                <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" required autocomplete="username">
+                                <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" autocomplete="email">
                                 @error('email')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror

@@ -37,7 +37,8 @@ class UserController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users',
+            'username' => 'required|unique:users',
+            'email' => 'nullable|email|unique:users',
             'password' => 'required|min:8',
             'owners' => 'array',
             'owners.*' => 'exists:owners,id',
@@ -67,6 +68,7 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $validatedData['name'],
+            'username' => $validatedData['username'],
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
         ]);
@@ -122,7 +124,8 @@ class UserController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id,
+            'username' => 'required|unique:users,username,' . $id,
+            'email' => 'nullable|email|unique:users,email,' . $id,
             'password' => 'nullable|min:8',
             'owners' => 'array',
             'owners.*' => 'exists:owners,id',
@@ -152,6 +155,7 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
         $user->name = $validatedData['name'];
+        $user->username = $validatedData['username'];
         $user->email = $validatedData['email'];
         if ($request->filled('password')) {
             $user->password = bcrypt($validatedData['password']);

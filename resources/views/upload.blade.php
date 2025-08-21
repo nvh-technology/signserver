@@ -143,10 +143,10 @@
                             @csrf
 
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    value="{{ old('email') }}" required autofocus>
-                                @error('email')
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username"
+                                    value="{{ old('username') }}" required autofocus>
+                                @error('username')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
