@@ -51,7 +51,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <span>871 Tân Xuân - Phường Tân Hưng - Tp. Hồ Chí Minh</span>
+                    <span>871 Trần Xuân Soạn - Phường Tân Hưng - Tp. Hồ Chí Minh</span>
                 </div>
             </div>
         </div>
