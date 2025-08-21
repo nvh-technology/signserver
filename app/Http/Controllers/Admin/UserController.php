@@ -72,7 +72,10 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('backgroundSignature')) {
-            $path = $request->file('backgroundSignature')->store('backgrounds');
+            $file = $request->file('backgroundSignature');
+            $extension = $file->getClientOriginalExtension();
+            $randomName = \Str::random(40) . '.' . $extension;
+            $path = $file->storeAs('backgrounds', $randomName);
             $user->backgroundSignature = $path;
             $user->save();
         }
@@ -159,7 +162,10 @@ class UserController extends Controller
             if ($user->backgroundSignature) {
                 Storage::disk('local')->delete($user->backgroundSignature);
             }
-            $path = $request->file('backgroundSignature')->store('backgrounds');
+            $file = $request->file('backgroundSignature');
+            $extension = $file->getClientOriginalExtension();
+            $randomName = \Str::random(40) . '.' . $extension;
+            $path = $file->storeAs('backgrounds', $randomName);
             $user->backgroundSignature = $path;
         }
 

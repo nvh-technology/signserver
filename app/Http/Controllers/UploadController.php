@@ -40,7 +40,8 @@ class UploadController extends Controller
         $file = $request->file('file_to_sign');
         $fileName = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-        $originalFilePath = $file->store('original_documents');
+        $randomName = \Str::random(40) . '.' . $extension;
+        $originalFilePath = $file->storeAs('original_documents', $randomName);
 
         $user = Auth::user();
         $ownerUser = OwnerUser::where('owner_id', $request->owner_id)
