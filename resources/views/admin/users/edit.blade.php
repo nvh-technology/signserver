@@ -28,7 +28,7 @@
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password (leave blank to keep current)</label>
-            <input type="password" class="form-control" id="password" name="password">
+            <input type="password" class="form-control" id="password" name="password" autocomplete="off">
         </div>
         <div class="mb-3">
             <label for="backgroundSignature" class="form-label">Background Signature (PNG only)</label>
