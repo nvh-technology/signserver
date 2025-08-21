@@ -39,18 +39,23 @@
                                 <span class="navbar-toggler-icon"></span>
                             </button>
                             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                                <ul class="navbar-nav">
+                                <ul class="navbar-nav align-items-center">
+                                    @role('admin')
                                     <li class="nav-item">
-                                        <a class="nav-link"
-                                            href="{{ route('profile.edit') }}">{{ request()->user()->name }}</a>
+                                        <a class="nav-link" href="{{ route('admin.users.index') }}">User Manage</a>
+                                    </li>
+                                    @endrole
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('profile.edit') }}">
+                                            {{ request()->user()->name }}
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
-                                            <a class="nav-link" href="route('logout')"
-                                                onclick="event.preventDefault();
-                                        this.closest('form').submit();">Log
-                                                Out</a>
+                                            <a class="nav-link" href="#" onclick="event.preventDefault(); this.closest('form').submit();">
+                                                Log Out
+                                            </a>
                                         </form>
                                     </li>
                                 </ul>
