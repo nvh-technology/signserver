@@ -28,7 +28,7 @@
                 <div class="d-flex justify-content-between w-100 align-items-center">
                     <a class="navbar-brand" href="/">
                         <span class="logo">
-                            <img src="{{ asset('images/logo.png') }}" height="80" class="img-fluid" alt="">
+                            <img src="{{ asset('images/logo.png') }}" style="max-height: 80px;" class="img-fluid" alt="">
                         </span>
                     </a>
                     <div class="w-100 text-end">
