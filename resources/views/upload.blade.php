@@ -17,16 +17,16 @@
                     </div>
                     <div class="carousel-inner rounded-3">
                         <div class="carousel-item active" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/1.png') }}" class="d-block w-100" alt="Slide 1">
+                            <img src="{{ asset('images/carousel/1.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 1">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/2.png') }}" class="d-block w-100" alt="Slide 2">
+                            <img src="{{ asset('images/carousel/2.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 2">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/3.png') }}" class="d-block w-100" alt="Slide 3">
+                            <img src="{{ asset('images/carousel/3.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 3">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/4.png') }}" class="d-block w-100" alt="Slide 4">
+                            <img src="{{ asset('images/carousel/4.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 4">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
