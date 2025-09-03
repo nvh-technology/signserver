@@ -32,7 +32,7 @@ class UploadController extends Controller
     {
         // 1. Validate the uploaded file and owner selection
         $request->validate([
-            'file_to_sign' => 'required|max:10240', // Max 10MB
+            // 'file_to_sign' => 'required|max:10240', // Max 10MB
             // 'file_to_sign' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // Max 10MB
             'owner_id' => 'required|exists:owners,id',
         ]);
