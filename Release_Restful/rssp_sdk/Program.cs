@@ -186,6 +186,7 @@ namespace RSSPAPI
                     }
                     // profile.SetVisibleSignature("-30,-100", "170,70", "DIGITAL SIGNATURE");
                     /*profile.SetVisibleSignature("1", "150,150,350,200");*/
+                    profile.timeFormat = "dd/MM/yyyy HH:mm:ss";
                     profile.SetCheckText(false);
                     profile.SetCheckMark(false);
                     profile.SetLocation(location);
