@@ -202,8 +202,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" id="save-position-btn" data-bs-dismiss="modal">Lưu
-                        vị trí</button>
                 </div>
             </div>
         </div>
@@ -236,6 +234,25 @@
         let signatureHighlight = null;
         const pageData = {}; // { pageNum: { viewport: originalViewport, canvas: canvasElement } }
 
+        function savePosition() {
+            signBtn.style.display = 'none';
+            if (selectedPage && selectedPosition) {
+                signaturePageInput.value = selectedPage;
+                signaturePositionInput.value = selectedPosition;
+                selectedPositionInfo.textContent = `Đã chọn vị trí ở trang ${selectedPage}`;
+                signBtn.style.display = 'block';
+            }
+        }
+
+        function clearSavedPosition() {
+            selectedPage = null;
+            selectedPosition = null;
+            signaturePageInput.value = '';
+            signaturePositionInput.value = '';
+            selectedPositionInfo.textContent = '';
+            signBtn.style.display = 'none';
+            clearHighlight();
+        }
 
         fileInput.addEventListener('change', function(e) {
             const pdfOptions = document.getElementById('pdf-options');
@@ -257,9 +274,7 @@
                 signBtn.style.display = 'none';
             }
             // Reset thông tin khi chọn file mới
-            selectedPositionInfo.textContent = '';
-            signaturePageInput.value = null;
-            signaturePositionInput.value = null;
+            clearSavedPosition();
         });
 
         // === THAY ĐỔI CHÍNH BẮT ĐẦU ===
@@ -384,6 +399,8 @@
                 const finalY_px = ((originalViewport.height - ury) / originalViewport.height) * canvas.height;
                 element.style.left = `${finalX_px}px`;
                 element.style.top = `${finalY_px}px`;
+
+                savePosition();
             };
 
             element.addEventListener('mousedown', onMouseDown);
@@ -504,20 +521,11 @@
 
                         selectedPosition = `${llx},${lly},${urx},${ury}`;
                         createOrUpdateHighlight(selectedPage, selectedPosition);
+                        savePosition();
                     });
                 });
             }
         }
-
-        document.getElementById('save-position-btn').addEventListener('click', function() {
-            signBtn.style.display = 'none';
-            if (selectedPage && selectedPosition) {
-                signaturePageInput.value = selectedPage;
-                signaturePositionInput.value = selectedPosition;
-                selectedPositionInfo.textContent = `Đã chọn vị trí ở trang ${selectedPage}`;
-                signBtn.style.display = 'block';
-            }
-        });
 
         document.querySelector('#upload-form-sign').addEventListener('submit', function(e) {
             const fileName = fileInput.files[0].name;
