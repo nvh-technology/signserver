@@ -355,18 +355,35 @@
                 const width = parseFloat(element.style.width);
                 const height = parseFloat(element.style.height);
 
-                const pdfX_ll = (x / canvas.width) * originalViewport.width;
-                const pdfY_ury = originalViewport.height - (y / canvas.height) * originalViewport.height;
-                const pdfX_ur = ((x + width) / canvas.width) * originalViewport.width;
-                const pdfY_ll = originalViewport.height - ((y + height) / canvas.height) * originalViewport.height;
+                // Convert pixel center to PDF center
+                const centerX_px = x + width / 2;
+                const centerY_px = y + height / 2;
+                let pdfX = (centerX_px / canvas.width) * originalViewport.width;
+                let pdfY = originalViewport.height - (centerY_px / canvas.height) * originalViewport.height;
 
-                const llx = Math.round(pdfX_ll);
-                const lly = Math.round(pdfY_ll);
-                const urx = Math.round(pdfX_ur);
-                const ury = Math.round(pdfY_ury);
+                // Apply boundary checks from click event
+                const halfWidth = signatureBoxSize.width / 2;
+                const halfHeight = signatureBoxSize.height / 2;
+
+                if (pdfX - halfWidth < 0) pdfX = halfWidth;
+                if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width - halfWidth;
+                if (pdfY - halfHeight < 0) pdfY = halfHeight;
+                if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height - halfHeight;
+
+                // Calculate final PDF coordinates
+                const llx = Math.round(pdfX - halfWidth);
+                const lly = Math.round(pdfY - halfHeight);
+                const urx = Math.round(pdfX + halfWidth);
+                const ury = Math.round(pdfY + halfHeight);
 
                 selectedPage = pageNum;
                 selectedPosition = `${llx},${lly},${urx},${ury}`;
+
+                // Visually snap the highlight to the corrected position
+                const finalX_px = ((llx) / originalViewport.width) * canvas.width;
+                const finalY_px = ((originalViewport.height - ury) / originalViewport.height) * canvas.height;
+                element.style.left = `${finalX_px}px`;
+                element.style.top = `${finalY_px}px`;
             };
 
             element.addEventListener('mousedown', onMouseDown);
