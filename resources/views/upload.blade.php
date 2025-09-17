@@ -277,7 +277,7 @@
                 const typedarray = new Uint8Array(this.result);
                 pdfjsLib.getDocument(typedarray).promise.then(pdf => {
                     pdfDoc = pdf;
-                    renderAllPagesAndHighlight(); // Gọi hàm render chính
+                    renderAllPages(); // Gọi hàm render chính
                 }, reason => {
                     console.error("Lỗi khi tải PDF:", reason);
                     pdfViewer.innerHTML =
@@ -290,15 +290,80 @@
         // Toàn bộ logic render đã được chuyển vào sự kiện 'shown.bs.modal' ở trên.
         // === THAY ĐỔI CHÍNH KẾT THÚC ===
 
-        function renderAllPagesAndHighlight() {
+        // Store references to highlight canvases and their original viewports
+        const highlightCanvases = {}; // { pageNum: { canvas: canvasElement, viewport: originalViewport } }
+
+        function clearAllHighlights() {
+            for (const pageNum in highlightCanvases) {
+                const canvas = highlightCanvases[pageNum].canvas;
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function drawHighlightOnPage(pageNum, position) {
+            clearAllHighlights(); // Clear previous highlights
+
+            const highlightData = highlightCanvases[pageNum];
+            if (!highlightData) return;
+
+            const highlightCanvas = highlightData.canvas;
+            const originalViewport = highlightData.viewport; // Use the stored original viewport
+
+            const context = highlightCanvas.getContext('2d');
+            context.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height); // Clear current page's highlight
+
+            if (position) {
+                const pos = position.split(',');
+
+                const llx_render = parseFloat(pos[0]);
+                const lly_render = parseFloat(pos[1]);
+                const urx_render = parseFloat(pos[2]);
+                const ury_render = parseFloat(pos[3]);
+
+                // Calculate coordinates relative to the highlight canvas's current dimensions
+                const x = llx_render * highlightCanvas.width / originalViewport.width;
+                const y = (originalViewport.height - ury_render) * highlightCanvas.height / originalViewport.height;
+                const width = (urx_render - llx_render) * highlightCanvas.width / originalViewport.width;
+                const height = (ury_render - lly_render) * highlightCanvas.height / originalViewport.height;
+
+                context.strokeStyle = 'red';
+                context.lineWidth = 2;
+                context.strokeRect(x, y, width, height);
+
+                // Scroll to the selected page
+                // const pdfPageContainer = document.getElementById(`pdf-page-container-${pageNum}`);
+                // if (pdfPageContainer) {
+                //     pdfViewer.scrollTo({
+                //         top: pdfPageContainer.offsetTop,
+                //         behavior: 'smooth'
+                //     });
+                // }
+            }
+        }
+
+
+        function renderAllPages() { // Renamed from renderAllPagesAndHighlight
             pdfViewer.innerHTML = ''; // Xóa thông báo "Đang tải"
             for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                 pdfDoc.getPage(pageNum).then(page => {
+                    const pageContainer = document.createElement('div');
+                    pageContainer.id = `pdf-page-container-${pageNum}`;
+                    pageContainer.style.position = 'relative';
+                    pageContainer.style.marginBottom = '10px'; // Add some spacing between pages
+
                     const canvas = document.createElement('canvas');
                     canvas.dataset.pageNumber = pageNum;
                     const context = canvas.getContext('2d', {
                         willReadFrequently: true
                     });
+
+                    const highlightCanvas = document.createElement('canvas');
+                    highlightCanvas.dataset.pageNumber = pageNum;
+                    highlightCanvas.style.position = 'absolute';
+                    highlightCanvas.style.top = '0';
+                    highlightCanvas.style.left = '0';
+                    highlightCanvas.style.pointerEvents = 'none'; // Allow clicks to pass through to the PDF canvas
 
                     const containerWidth = pdfViewer.clientWidth;
                     const originalViewportForScale = page.getViewport({
@@ -311,48 +376,35 @@
 
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
+                    highlightCanvas.height = viewport.height;
+                    highlightCanvas.width = viewport.width;
+
+                    // Store reference to highlight canvas and its original viewport
+                    highlightCanvases[pageNum] = {
+                        canvas: highlightCanvas,
+                        viewport: originalViewportForScale
+                    };
 
                     const renderContext = {
                         canvasContext: context,
                         viewport: viewport
                     };
                     page.render(renderContext).promise.then(() => {
+                        // After PDF is rendered, draw highlight if this is the selected page
                         if (pageNum === selectedPage && selectedPosition) {
-                            const pos = selectedPosition.split(',');
-                            const originalViewport = page.getViewport({
-                                scale: 1
-                            });
-
-                            // Logic vẽ highlight không đổi
-                            const llx_render = parseFloat(pos[0]);
-                            const lly_render = parseFloat(pos[1]);
-                            const urx_render = parseFloat(pos[2]);
-                            const ury_render = parseFloat(pos[3]);
-
-                            const x = llx_render * viewport.width / originalViewport.width;
-                            const y = (originalViewport.height - ury_render) * viewport.height /
-                                originalViewport.height;
-                            const width = (urx_render - llx_render) * viewport.width / originalViewport
-                                .width;
-                            const height = (ury_render - lly_render) * viewport.height / originalViewport
-                                .height;
-
-                            context.strokeStyle = 'red';
-                            context.lineWidth = 2;
-                            context.strokeRect(x, y, width, height);
-
-                            pdfViewer.scrollTo({
-                                top: canvas.offsetTop,
-                                behavior: 'smooth'
-                            });
+                            drawHighlightOnPage(pageNum, selectedPosition);
                         }
                     });
 
-                    pdfViewer.appendChild(canvas);
+                    pageContainer.appendChild(canvas);
+                    pageContainer.appendChild(highlightCanvas);
+                    pdfViewer.appendChild(pageContainer);
+
 
                     // Gắn lại sự kiện click cho canvas mới
                     canvas.addEventListener('click', function(e) {
-                        selectedPage = parseInt(canvas.dataset.pageNumber);
+                        const currentPageNum = parseInt(canvas.dataset.pageNumber);
+                        selectedPage = currentPageNum;
 
                         const rect = canvas.getBoundingClientRect();
                         const x = e.clientX - rect.left;
@@ -390,9 +442,8 @@
                         const ury = Math.round(pdfY + halfHeight);
                         // === KẾT THÚC THAY ĐỔI LOGIC ===
 
-                        selectedPosition =
-                            `${llx},${lly},${urx},${ury}`;
-                        renderAllPagesAndHighlight();
+                        selectedPosition = `${llx},${lly},${urx},${ury}`;
+                        drawHighlightOnPage(selectedPage, selectedPosition); // Call new function
                     });
                 });
             }
