@@ -233,6 +233,9 @@
             width: 170,
             height: 70
         };
+        let signatureHighlight = null;
+        const pageData = {}; // { pageNum: { viewport: originalViewport, canvas: canvasElement } }
+
 
         fileInput.addEventListener('change', function(e) {
             const pdfOptions = document.getElementById('pdf-options');
@@ -290,80 +293,139 @@
         // Toàn bộ logic render đã được chuyển vào sự kiện 'shown.bs.modal' ở trên.
         // === THAY ĐỔI CHÍNH KẾT THÚC ===
 
-        // Store references to highlight canvases and their original viewports
-        const highlightCanvases = {}; // { pageNum: { canvas: canvasElement, viewport: originalViewport } }
-
-        function clearAllHighlights() {
-            for (const pageNum in highlightCanvases) {
-                const canvas = highlightCanvases[pageNum].canvas;
-                const context = canvas.getContext('2d');
-                context.clearRect(0, 0, canvas.width, canvas.height);
+        function clearHighlight() {
+            if (signatureHighlight && signatureHighlight.parentElement) {
+                signatureHighlight.parentElement.removeChild(signatureHighlight);
+                signatureHighlight = null;
             }
         }
 
-        function drawHighlightOnPage(pageNum, position) {
-            clearAllHighlights(); // Clear previous highlights
+        function makeDraggable(element, container) {
+            let isDragging = false;
+            let offsetX, offsetY;
 
-            const highlightData = highlightCanvases[pageNum];
-            if (!highlightData) return;
+            const onMouseDown = (e) => {
+                if (e.button !== 0) return;
+                isDragging = true;
+                const elementRect = element.getBoundingClientRect();
+                offsetX = e.clientX - elementRect.left;
+                offsetY = e.clientY - elementRect.top;
+                element.style.cursor = 'grabbing';
+                document.body.style.cursor = 'grabbing';
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                e.preventDefault();
+                e.stopPropagation(); // Prevent canvas click event
+            };
 
-            const highlightCanvas = highlightData.canvas;
-            const originalViewport = highlightData.viewport; // Use the stored original viewport
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                const containerRect = container.getBoundingClientRect();
+                let newX = e.clientX - containerRect.left - offsetX;
+                let newY = e.clientY - containerRect.top - offsetY;
 
-            const context = highlightCanvas.getContext('2d');
-            context.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height); // Clear current page's highlight
+                if (newX < 0) newX = 0;
+                if (newY < 0) newY = 0;
+                if (newX + element.offsetWidth > container.clientWidth) {
+                    newX = container.clientWidth - element.offsetWidth;
+                }
+                if (newY + element.offsetHeight > container.clientHeight) {
+                    newY = container.clientHeight - element.offsetHeight;
+                }
 
-            if (position) {
-                const pos = position.split(',');
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+            };
 
-                const llx_render = parseFloat(pos[0]);
-                const lly_render = parseFloat(pos[1]);
-                const urx_render = parseFloat(pos[2]);
-                const ury_render = parseFloat(pos[3]);
+            const onMouseUp = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                element.style.cursor = 'move';
+                document.body.style.cursor = 'default';
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
 
-                // Calculate coordinates relative to the highlight canvas's current dimensions
-                const x = llx_render * highlightCanvas.width / originalViewport.width;
-                const y = (originalViewport.height - ury_render) * highlightCanvas.height / originalViewport.height;
-                const width = (urx_render - llx_render) * highlightCanvas.width / originalViewport.width;
-                const height = (ury_render - lly_render) * highlightCanvas.height / originalViewport.height;
+                const pageNum = parseInt(container.querySelector('canvas').dataset.pageNumber);
+                const pageInfo = pageData[pageNum];
+                const canvas = pageInfo.canvas;
+                const originalViewport = pageInfo.viewport;
 
-                context.strokeStyle = 'red';
-                context.lineWidth = 2;
-                context.strokeRect(x, y, width, height);
+                const x = parseFloat(element.style.left);
+                const y = parseFloat(element.style.top);
+                const width = parseFloat(element.style.width);
+                const height = parseFloat(element.style.height);
 
-                // Scroll to the selected page
-                // const pdfPageContainer = document.getElementById(`pdf-page-container-${pageNum}`);
-                // if (pdfPageContainer) {
-                //     pdfViewer.scrollTo({
-                //         top: pdfPageContainer.offsetTop,
-                //         behavior: 'smooth'
-                //     });
-                // }
-            }
+                const pdfX_ll = (x / canvas.width) * originalViewport.width;
+                const pdfY_ury = originalViewport.height - (y / canvas.height) * originalViewport.height;
+                const pdfX_ur = ((x + width) / canvas.width) * originalViewport.width;
+                const pdfY_ll = originalViewport.height - ((y + height) / canvas.height) * originalViewport.height;
+
+                const llx = Math.round(pdfX_ll);
+                const lly = Math.round(pdfY_ll);
+                const urx = Math.round(pdfX_ur);
+                const ury = Math.round(pdfY_ury);
+
+                selectedPage = pageNum;
+                selectedPosition = `${llx},${lly},${urx},${ury}`;
+            };
+
+            element.addEventListener('mousedown', onMouseDown);
         }
 
 
-        function renderAllPages() { // Renamed from renderAllPagesAndHighlight
-            pdfViewer.innerHTML = ''; // Xóa thông báo "Đang tải"
+        function createOrUpdateHighlight(pageNum, position) {
+            clearHighlight();
+
+            const pageInfo = pageData[pageNum];
+            if (!pageInfo) return;
+
+            const pageContainer = document.getElementById(`pdf-page-container-${pageNum}`);
+            if (!pageContainer) return;
+
+
+            signatureHighlight = document.createElement('div');
+            signatureHighlight.style.position = 'absolute';
+            signatureHighlight.style.border = '2px dashed red';
+            signatureHighlight.style.cursor = 'move';
+            pageContainer.appendChild(signatureHighlight);
+            makeDraggable(signatureHighlight, pageContainer);
+
+
+            const pos = position.split(',');
+            const llx_render = parseFloat(pos[0]);
+            const lly_render = parseFloat(pos[1]);
+            const urx_render = parseFloat(pos[2]);
+            const ury_render = parseFloat(pos[3]);
+
+            const originalViewport = pageInfo.viewport;
+            const canvas = pageInfo.canvas;
+
+            const x = llx_render * canvas.width / originalViewport.width;
+            const y = (originalViewport.height - ury_render) * canvas.height / originalViewport.height;
+            const width = (urx_render - llx_render) * canvas.width / originalViewport.width;
+            const height = (ury_render - lly_render) * canvas.height / originalViewport.height;
+
+            signatureHighlight.style.left = `${x}px`;
+            signatureHighlight.style.top = `${y}px`;
+            signatureHighlight.style.width = `${width}px`;
+            signatureHighlight.style.height = `${height}px`;
+        }
+
+
+        function renderAllPages() {
+            pdfViewer.innerHTML = '';
             for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                 pdfDoc.getPage(pageNum).then(page => {
                     const pageContainer = document.createElement('div');
                     pageContainer.id = `pdf-page-container-${pageNum}`;
                     pageContainer.style.position = 'relative';
-                    pageContainer.style.marginBottom = '10px'; // Add some spacing between pages
+                    pageContainer.style.marginBottom = '10px';
 
                     const canvas = document.createElement('canvas');
                     canvas.dataset.pageNumber = pageNum;
                     const context = canvas.getContext('2d', {
                         willReadFrequently: true
                     });
-
-                    const highlightCanvas = document.createElement('canvas');
-                    highlightCanvas.dataset.pageNumber = pageNum;
-                    highlightCanvas.style.position = 'absolute';
-                    highlightCanvas.style.top = '0';
-                    highlightCanvas.style.left = '0';
-                    highlightCanvas.style.pointerEvents = 'none'; // Allow clicks to pass through to the PDF canvas
 
                     const containerWidth = pdfViewer.clientWidth;
                     const originalViewportForScale = page.getViewport({
@@ -376,12 +438,9 @@
 
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
-                    highlightCanvas.height = viewport.height;
-                    highlightCanvas.width = viewport.width;
 
-                    // Store reference to highlight canvas and its original viewport
-                    highlightCanvases[pageNum] = {
-                        canvas: highlightCanvas,
+                    pageData[pageNum] = {
+                        canvas: canvas,
                         viewport: originalViewportForScale
                     };
 
@@ -390,18 +449,14 @@
                         viewport: viewport
                     };
                     page.render(renderContext).promise.then(() => {
-                        // After PDF is rendered, draw highlight if this is the selected page
                         if (pageNum === selectedPage && selectedPosition) {
-                            drawHighlightOnPage(pageNum, selectedPosition);
+                            createOrUpdateHighlight(pageNum, selectedPosition);
                         }
                     });
 
                     pageContainer.appendChild(canvas);
-                    pageContainer.appendChild(highlightCanvas);
                     pdfViewer.appendChild(pageContainer);
 
-
-                    // Gắn lại sự kiện click cho canvas mới
                     canvas.addEventListener('click', function(e) {
                         const currentPageNum = parseInt(canvas.dataset.pageNumber);
                         selectedPage = currentPageNum;
@@ -417,33 +472,21 @@
                         let pdfX = (x / rect.width) * originalViewport.width;
                         let pdfY = originalViewport.height - ((y / rect.height) * originalViewport.height);
 
-                        // === THAY ĐỔI LOGIC: LẤY VỊ TRÍ CLICK LÀM TÂM ===
                         const halfWidth = signatureBoxSize.width / 2;
                         const halfHeight = signatureBoxSize.height / 2;
 
-                        // 1. Cập nhật logic kiểm tra biên để hộp không bị tràn
-                        if (pdfX - halfWidth < 0) {
-                            pdfX = halfWidth;
-                        }
-                        if (pdfX + halfWidth > originalViewport.width) {
-                            pdfX = originalViewport.width - halfWidth;
-                        }
-                        if (pdfY - halfHeight < 0) {
-                            pdfY = halfHeight;
-                        }
-                        if (pdfY + halfHeight > originalViewport.height) {
-                            pdfY = originalViewport.height - halfHeight;
-                        }
+                        if (pdfX - halfWidth < 0) pdfX = halfWidth;
+                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width - halfWidth;
+                        if (pdfY - halfHeight < 0) pdfY = halfHeight;
+                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height - halfHeight;
 
-                        // 2. Tính toán tọa độ các góc từ tâm (pdfX, pdfY)
                         const llx = Math.round(pdfX - halfWidth);
                         const lly = Math.round(pdfY - halfHeight);
                         const urx = Math.round(pdfX + halfWidth);
                         const ury = Math.round(pdfY + halfHeight);
-                        // === KẾT THÚC THAY ĐỔI LOGIC ===
 
                         selectedPosition = `${llx},${lly},${urx},${ury}`;
-                        drawHighlightOnPage(selectedPage, selectedPosition); // Call new function
+                        createOrUpdateHighlight(selectedPage, selectedPosition);
                     });
                 });
             }
