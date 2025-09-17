@@ -17,16 +17,20 @@
                     </div>
                     <div class="carousel-inner rounded-3">
                         <div class="carousel-item active" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/1.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 1">
+                            <img src="{{ asset('images/carousel/1.jpg') }}" style="aspect-ratio: 5/3;"
+                                class="object-fit-cover d-block w-100" alt="Slide 1">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/2.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 2">
+                            <img src="{{ asset('images/carousel/2.jpg') }}" style="aspect-ratio: 5/3;"
+                                class="object-fit-cover d-block w-100" alt="Slide 2">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/3.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 3">
+                            <img src="{{ asset('images/carousel/3.jpg') }}" style="aspect-ratio: 5/3;"
+                                class="object-fit-cover d-block w-100" alt="Slide 3">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
-                            <img src="{{ asset('images/carousel/4.jpg') }}" style="aspect-ratio: 5/3;" class="object-fit-cover d-block w-100" alt="Slide 4">
+                            <img src="{{ asset('images/carousel/4.jpg') }}" style="aspect-ratio: 5/3;"
+                                class="object-fit-cover d-block w-100" alt="Slide 4">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
@@ -86,7 +90,7 @@
                             <div class="mb-3">
                                 <label for="owner_id" class="form-label">Tổ chức</label>
                                 <select class="form-select" id="owner_id" name="owner_id" required>
-                                    @foreach($owners as $owner)
+                                    @foreach ($owners as $owner)
                                         <option value="{{ $owner->id }}">{{ $owner->name }}</option>
                                     @endforeach
                                 </select>
@@ -94,23 +98,24 @@
                             <div id="pdf-options">
                                 <div class="mb-3">
                                     <label for="reason" class="form-label">Lý do ký</label>
-                                    <input type="text" class="form-control" id="reason" name="reason" value="Ký hợp đồng điện tử">
+                                    <input type="text" class="form-control" id="reason" name="reason"
+                                        value="Ký hợp đồng điện tử">
                                 </div>
                                 <div class="mb-3">
                                     <label for="location" class="form-label">Nơi ký</label>
-                                    <input type="text" class="form-control" id="location" name="location" value="Hồ Chí Minh">
-                                </div>
-                                <div class="mb-3">
-                                    <button type="button" class="btn btn-secondary" id="select-position-btn"
-                                        style="display: none;" data-bs-toggle="modal" data-bs-target="#pdf-modal">
-                                        Chọn vị trí ký
-                                    </button>
-                                    <span id="selected-position-info"></span>
+                                    <input type="text" class="form-control" id="location" name="location"
+                                        value="Hồ Chí Minh">
                                 </div>
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">Ký dữ liệu</button>
+                                <button type="button" class="btn btn-secondary" id="select-position-btn"
+                                    data-bs-toggle="modal" data-bs-target="#pdf-modal">
+                                    Chọn vị trí ký
+                                </button>
+                                <span id="selected-position-info"></span>
+                                <button type="submit" id="sign-btn" class="btn btn-primary btn-lg"
+                                    style="display: none">Ký dữ liệu</button>
                             </div>
                         </form>
 
@@ -218,6 +223,7 @@
         const signaturePositionInput = document.getElementById('signature_position');
         const selectedPositionInfo = document.getElementById('selected-position-info');
         const pdfModal = document.getElementById('pdf-modal'); // Thêm ID modal
+        const signBtn = document.getElementById('sign-btn');
 
         // Khai báo các biến trạng thái
         let pdfDoc = null;
@@ -235,14 +241,17 @@
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 if (fileExtension === 'pdf') {
                     pdfOptions.style.display = 'block';
-                    selectPosBtn.style.display = 'inline-block';
+                    selectPosBtn.style.display = 'block';
+                    signBtn.style.display = 'none';
                 } else {
                     pdfOptions.style.display = 'none';
                     selectPosBtn.style.display = 'none';
+                    signBtn.style.display = 'block';
                 }
             } else {
                 pdfOptions.style.display = 'block';
                 selectPosBtn.style.display = 'none';
+                signBtn.style.display = 'none';
             }
             // Reset thông tin khi chọn file mới
             selectedPositionInfo.textContent = '';
@@ -390,18 +399,22 @@
         }
 
         document.getElementById('save-position-btn').addEventListener('click', function() {
+            signBtn.style.display = 'none';
             if (selectedPage && selectedPosition) {
                 signaturePageInput.value = selectedPage;
                 signaturePositionInput.value = selectedPosition;
                 selectedPositionInfo.textContent = `Đã chọn vị trí ở trang ${selectedPage}`;
+                signBtn.style.display = 'block';
             }
         });
 
         document.querySelector('#upload-form-sign').addEventListener('submit', function(e) {
-            if (!signaturePositionInput.value) {
+            const fileName = fileInput.files[0].name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+            if (fileExtension === 'pdf' && !signaturePositionInput.value) {
                 // Bạn có thể bật lại tính năng này nếu muốn bắt buộc chọn vị trí
-                // e.preventDefault();
-                // alert('Vui lòng chọn vị trí ký');
+                e.preventDefault();
+                alert('Vui lòng chọn vị trí ký');
             }
         });
     </script>
