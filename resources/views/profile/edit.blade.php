@@ -9,25 +9,50 @@
                 @if (session('status') === 'profile-updated')
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ __('Your profile has been updated.') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                     </div>
                 @elseif (session('status') === 'password-updated')
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ __('Your password has been updated.') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                     </div>
                 @elseif (session('status') === 'passcode-updated')
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ __('Your passcode has been updated.') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                     </div>
                 @endif
 
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @endif
+
+                @if (session('fail'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('fail') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                
                 <!-- Profile Information Form -->
                 <div class="card mb-4 shadow-sm">
                     <div class="card-header">
                         <h5 class="card-title mb-0">{{ __('Profile Information') }}</h5>
-                        <p class="card-text text-muted">{{ __("Update your account's profile information and email address.") }}</p>
+                        <p class="card-text text-muted">
+                            {{ __("Update your account's profile information and email address.") }}</p>
                     </div>
                     <div class="card-body">
                         <form id="send-verification" method="post" action="{{ route('verification.send') }}">
@@ -40,7 +65,8 @@
 
                             <div class="mb-3">
                                 <label for="name" class="form-label">{{ __('Name') }}</label>
-                                <input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
+                                <input id="name" name="name" type="text" class="form-control"
+                                    value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
                                 @error('name')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
@@ -48,7 +74,8 @@
 
                             <div class="mb-3">
                                 <label for="username" class="form-label">{{ __('Username') }}</label>
-                                <input id="username" name="username" type="text" class="form-control" value="{{ old('username', $user->username) }}" required autocomplete="username">
+                                <input id="username" name="username" type="text" class="form-control"
+                                    value="{{ old('username', $user->username) }}" required autocomplete="username">
                                 @error('username')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
@@ -56,12 +83,13 @@
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">{{ __('Email') }}</label>
-                                <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" autocomplete="email">
+                                <input id="email" name="email" type="email" class="form-control"
+                                    value="{{ old('email', $user->email) }}" autocomplete="email">
                                 @error('email')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
 
-                                @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+                                @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
                                     <div class="mt-2">
                                         <p class="text-sm text-muted">
                                             {{ __('Your email address is unverified.') }}
@@ -91,7 +119,8 @@
                 <div class="card mb-4 shadow-sm">
                     <div class="card-header">
                         <h5 class="card-title mb-0">{{ __('Update Password') }}</h5>
-                        <p class="card-text text-muted">{{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
+                        <p class="card-text text-muted">
+                            {{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
                     </div>
                     <div class="card-body">
                         <form method="post" action="{{ route('password.update') }}" class="mt-4">
@@ -99,8 +128,10 @@
                             @method('put')
 
                             <div class="mb-3">
-                                <label for="update_password_current_password" class="form-label">{{ __('Current Password') }}</label>
-                                <input id="update_password_current_password" name="current_password" type="password" class="form-control" autocomplete="current-password">
+                                <label for="update_password_current_password"
+                                    class="form-label">{{ __('Current Password') }}</label>
+                                <input id="update_password_current_password" name="current_password" type="password"
+                                    class="form-control" autocomplete="current-password">
                                 @error('current_password', 'updatePassword')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
@@ -108,15 +139,18 @@
 
                             <div class="mb-3">
                                 <label for="update_password_password" class="form-label">{{ __('New Password') }}</label>
-                                <input id="update_password_password" name="password" type="password" class="form-control" autocomplete="new-password">
+                                <input id="update_password_password" name="password" type="password"
+                                    class="form-control" autocomplete="new-password">
                                 @error('password', 'updatePassword')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="update_password_password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
-                                <input id="update_password_password_confirmation" name="password_confirmation" type="password" class="form-control" autocomplete="new-password">
+                                <label for="update_password_password_confirmation"
+                                    class="form-label">{{ __('Confirm Password') }}</label>
+                                <input id="update_password_password_confirmation" name="password_confirmation"
+                                    type="password" class="form-control" autocomplete="new-password">
                                 @error('password_confirmation', 'updatePassword')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
@@ -141,26 +175,30 @@
                             @method('put')
 
                             @if (Auth::user()->passcode)
-                            <div class="mb-3">
-                                <label for="current_passcode" class="form-label">{{ __('Current Passcode') }}</label>
-                                <input id="current_passcode" name="current_passcode" type="password" class="form-control" autocomplete="current-passcode" maxlength="6">
-                                @error('current_passcode', 'updatePasscode')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <div class="mb-3">
+                                    <label for="current_passcode" class="form-label">{{ __('Current Passcode') }}</label>
+                                    <input id="current_passcode" name="current_passcode" type="password"
+                                        class="form-control" autocomplete="current-passcode" maxlength="6">
+                                    @error('current_passcode', 'updatePasscode')
+                                        <div class="text-danger mt-2">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             @endif
 
                             <div class="mb-3">
                                 <label for="passcode" class="form-label">{{ __('New Passcode') }}</label>
-                                <input id="passcode" name="passcode" type="password" class="form-control" autocomplete="new-passcode" maxlength="6">
+                                <input id="passcode" name="passcode" type="password" class="form-control"
+                                    autocomplete="new-passcode" maxlength="6">
                                 @error('passcode', 'updatePasscode')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="passcode_confirmation" class="form-label">{{ __('Confirm Passcode') }}</label>
-                                <input id="passcode_confirmation" name="passcode_confirmation" type="password" class="form-control" autocomplete="new-passcode" maxlength="6">
+                                <label for="passcode_confirmation"
+                                    class="form-label">{{ __('Confirm Passcode') }}</label>
+                                <input id="passcode_confirmation" name="passcode_confirmation" type="password"
+                                    class="form-control" autocomplete="new-passcode" maxlength="6">
                                 @error('passcode_confirmation', 'updatePasscode')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror

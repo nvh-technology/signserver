@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -35,14 +35,14 @@
                         @if (request()->user())
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                                aria-label="Toggle navigation">
+                                aria-label="Chuyển đổi điều hướng">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
                             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                                 <ul class="navbar-nav align-items-center">
                                     @role('admin')
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('admin.users.index') }}">User Manage</a>
+                                        <a class="nav-link" href="{{ route('admin.users.index') }}">Quản lý người dùng</a>
                                     </li>
                                     @endrole
                                     <li class="nav-item">
@@ -54,7 +54,7 @@
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
                                             <a class="nav-link" href="#" onclick="event.preventDefault(); this.closest('form').submit();">
-                                                Log Out
+                                                Đăng xuất
                                             </a>
                                         </form>
                                     </li>

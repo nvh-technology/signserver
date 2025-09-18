@@ -45,7 +45,7 @@ class UploadController extends Controller
         if ($user->passcode) {
             // If yes, check if the provided passcode is correct
             if (!Hash::check($request->passcode, $user->passcode)) {
-                return back()->with('fail', 'Invalid passcode.');
+                return back()->with('fail', __('validation.custom.fail.invalid_passcode'));
             }
         } else {
             // If no, this is the new passcode, so hash and save it
@@ -65,7 +65,7 @@ class UploadController extends Controller
             ->first();
 
         if (!$ownerUser) {
-            return back()->with('fail', 'You are not associated with the selected owner.');
+            return back()->with('fail', __('validation.custom.fail.not_associated_with_owner'));
         }
 
         // 2. Call the helper to sign the file

@@ -52,15 +52,15 @@ class ProfileController extends Controller
         if ($user->passcode) {
             $rules['current_passcode'] = ['required', function ($attribute, $value, $fail) use ($user) {
                 if (!Hash::check($value, $user->passcode)) {
-                    $fail('The provided current passcode does not match your actual passcode.');
+                    $fail(__('validation.custom.passcode_update.current_passcode_mismatch'));
                 }
             }];
         }
 
         $validated = $request->validate($rules, [
-            'current_passcode.required' => __('Please enter your current passcode.'),
-            'passcode.required' => __('Please enter a new passcode.'),
-            'passcode.confirmed' => __('The new passcode confirmation does not match.'),
+            'current_passcode.required' => __('validation.custom.passcode_update.current_passcode_required'),
+            'passcode.required' => __('validation.custom.passcode_update.new_passcode_required'),
+            'passcode.confirmed' => __('validation.custom.passcode_update.new_passcode_confirmed'),
         ]);
 
         $user->passcode = Hash::make($validated['passcode']);

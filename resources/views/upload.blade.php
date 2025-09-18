@@ -7,41 +7,41 @@
                 <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
-                            aria-current="true" aria-label="Slide 1"></button>
+                            aria-current="true" aria-label="Trang trình bày 1"></button>
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                            aria-label="Slide 2"></button>
+                            aria-label="Trang trình bày 2"></button>
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                            aria-label="Slide 3"></button>
+                            aria-label="Trang trình bày 3"></button>
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"
-                            aria-label="Slide 4"></button>
+                            aria-label="Trang trình bày 4"></button>
                     </div>
                     <div class="carousel-inner rounded-3">
                         <div class="carousel-item active" data-bs-interval="2000">
                             <img src="{{ asset('images/carousel/1.jpg') }}" style="aspect-ratio: 5/3;"
-                                class="object-fit-cover d-block w-100" alt="Slide 1">
+                                class="object-fit-cover d-block w-100" alt="Trang trình bày 1">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
                             <img src="{{ asset('images/carousel/2.jpg') }}" style="aspect-ratio: 5/3;"
-                                class="object-fit-cover d-block w-100" alt="Slide 2">
+                                class="object-fit-cover d-block w-100" alt="Trang trình bày 2">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
                             <img src="{{ asset('images/carousel/3.jpg') }}" style="aspect-ratio: 5/3;"
-                                class="object-fit-cover d-block w-100" alt="Slide 3">
+                                class="object-fit-cover d-block w-100" alt="Trang trình bày 3">
                         </div>
                         <div class="carousel-item" data-bs-interval="2000">
                             <img src="{{ asset('images/carousel/4.jpg') }}" style="aspect-ratio: 5/3;"
-                                class="object-fit-cover d-block w-100" alt="Slide 4">
+                                class="object-fit-cover d-block w-100" alt="Trang trình bày 4">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
                         data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
+                        <span class="visually-hidden">Trước</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
                         data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
+                        <span class="visually-hidden">Tiếp theo</span>
                     </button>
                 </div>
             </div>
@@ -54,14 +54,14 @@
                         @if (session('success'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                             </div>
                         @endif
 
                         @if (session('fail'))
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 {{ session('fail') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                             </div>
                         @endif
 
@@ -148,7 +148,7 @@
                             @csrf
 
                             <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
+                                <label for="username" class="form-label">Tên đăng nhập</label>
                                 <input type="text" class="form-control" id="username" name="username"
                                     value="{{ old('username') }}" required autofocus>
                                 @error('username')
@@ -194,13 +194,13 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="pdfModalLabel">Chọn vị trí ký</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body bg-light p-0">
                     <div id="pdf-viewer" style="overflow-y: scroll;overflow-x: clip;max-height: 75vh;"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
@@ -212,7 +212,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="passcodeModalLabel">Xác nhận Passcode</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
                     <form id="passcode-form">
@@ -286,6 +286,10 @@
 
         fileInput.addEventListener('change', function(e) {
             const pdfOptions = document.getElementById('pdf-options');
+
+            // Reset thông tin khi chọn file mới
+            clearSavedPosition();
+
             if (e.target.files.length > 0) {
                 const fileName = e.target.files[0].name;
                 const fileExtension = fileName.split('.').pop().toLowerCase();
@@ -303,8 +307,6 @@
                 selectPosBtn.style.display = 'none';
                 signBtn.style.display = 'none';
             }
-            // Reset thông tin khi chọn file mới
-            clearSavedPosition();
         });
 
         // === THAY ĐỔI CHÍNH BẮT ĐẦU ===
@@ -313,7 +315,7 @@
             // Toàn bộ logic load và render PDF được chuyển vào đây
             const file = fileInput.files[0];
             if (!file) {
-                console.error("Không có file nào được chọn.");
+                console.error("Chưa có tệp nào được chọn.");
                 return;
             }
 
@@ -329,7 +331,7 @@
                 }, reason => {
                     console.error("Lỗi khi tải PDF:", reason);
                     pdfViewer.innerHTML =
-                        '<div class="alert alert-danger">Không thể đọc được file PDF này.</div>';
+                        '<div class="alert alert-danger">Không thể đọc được tệp PDF này.</div>';
                 });
             };
             fileReader.readAsArrayBuffer(file);
@@ -565,7 +567,7 @@
             const fileName = fileInput.files[0].name;
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (fileExtension === 'pdf' && !signaturePositionInput.value) {
-                alert('Vui lòng chọn vị trí ký');
+                alert('Vui lòng chọn vị trí ký.');
                 return; // Dừng lại nếu là file PDF và chưa chọn vị trí
             }
 
@@ -575,7 +577,7 @@
         confirmPasscodeBtn.addEventListener('click', function() {
             const passcode = document.getElementById('passcode').value;
             if (!passcode) {
-                alert('Vui lòng nhập passcode.');
+                alert('Vui lòng nhập mã bảo vệ.');
                 return;
             }
 

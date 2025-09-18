@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Roles')
+@section('title', 'Vai trò')
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Roles</h1>
+        <h1>Vai trò</h1>
         @can('manage roles')
-            <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">Add New Role</a>
+            <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">Thêm vai trò mới</a>
         @endcan
     </div>
 
@@ -20,9 +20,9 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Permissions</th>
-                <th>Actions</th>
+                <th>Tên</th>
+                <th>Quyền</th>
+                <th>Hành động</th>
             </tr>
         </thead>
         <tbody>
@@ -37,18 +37,18 @@
                     </td>
                     <td>
                         @can('manage roles')
-                            <a href="{{ route('admin.roles.edit', $role->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{{ route('admin.roles.edit', $role->id) }}" class="btn btn-sm btn-warning">Sửa</a>
                             <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn không?')">Xóa</button>
                             </form>
                         @endcan
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">No roles found.</td>
+                    <td colspan="4">Không tìm thấy vai trò nào.</td>
                 </tr>
             @endforelse
         </tbody>

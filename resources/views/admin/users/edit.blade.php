@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit User')
+@section('title', 'Chỉnh sửa người dùng')
 
 @section('content')
-    <h1>Edit User</h1>
+    <h1>Chỉnh sửa người dùng</h1>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -19,11 +19,11 @@
         @csrf
         @method('PUT')
         <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
+            <label for="name" class="form-label">Tên</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
         </div>
         <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
+            <label for="username" class="form-label">Tên đăng nhập</label>
             <input type="text" class="form-control" id="username" name="username" value="{{ old('username', $user->username) }}" required>
         </div>
         <div class="mb-3">
@@ -31,26 +31,26 @@
             <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}">
         </div>
         <div class="mb-3">
-            <label for="password" class="form-label">Password (leave blank to keep current)</label>
+            <label for="password" class="form-label">Mật khẩu (để trống nếu không đổi)</label>
             <input type="password" class="form-control" id="password" name="password" autocomplete="off">
         </div>
         <div class="mb-3">
-            <label for="passcode" class="form-label">Passcode (6 digits, leave blank to keep current)</label>
+            <label for="passcode" class="form-label">Mã bảo vệ (6 chữ số, để trống nếu không đổi)</label>
             <input type="password" class="form-control" id="passcode" name="passcode" maxlength="6" autocomplete="off">
         </div>
         <div class="mb-3">
-            <label for="backgroundSignature" class="form-label">Background Signature (PNG only)</label>
+            <label for="backgroundSignature" class="form-label">Chữ ký nền (chỉ PNG)</label>
             <input type="file" class="form-control" id="backgroundSignature" name="backgroundSignature" accept=".png">
             @if ($user->backgroundSignature)
                 <div class="mt-2">
-                    <p>Current background:</p>
+                    <p>Chữ ký nền hiện tại:</p>
                     <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Background Signature" width="150">
                 </div>
             @endif
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Assign Owners</label>
+            <label class="form-label">Gán tổ chức</label>
             <div id="owners-container">
                 @foreach ($owners as $owner)
                 @php
@@ -64,13 +64,13 @@
                     </label>
                 </div>
                 <div class="owner-pivot-fields card card-body bg-light mb-3" id="pivot_fields_{{ $owner->id }}" style="display: {{ old('owners') ? (in_array($owner->id, old('owners')) ? 'block' : 'none') : ($isAssigned ? 'block' : 'none') }};">
-                    <h6 class="card-title">Details for {{ $owner->name }}</h6>
+                    <h6 class="card-title">Chi tiết cho {{ $owner->name }}</h6>
                     <div class="mb-3">
-                        <label for="userName_{{ $owner->id }}" class="form-label">User Name:</label>
+                        <label for="userName_{{ $owner->id }}" class="form-label">Tên người dùng:</label>
                         <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][userName]" id="userName_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.userName', $pivotData ? $pivotData->userName : '') }}" autocomplete="off">
                     </div>
                     <div class="mb-3">
-                        <label for="passcode_{{ $owner->id }}" class="form-label">Passcode:</label>
+                        <label for="passcode_{{ $owner->id }}" class="form-label">Mã bảo vệ:</label>
                         <input type="text" class="form-control" name="owner_pivot[{{ $owner->id }}][passcode]" id="passcode_{{ $owner->id }}" value="{{ old('owner_pivot.' . $owner->id . '.passcode', $pivotData ? $pivotData->passcode : '') }}" autocomplete="off">
                     </div>
                     <div class="mb-3">
@@ -82,8 +82,8 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Update</button>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Hủy</a>
     </form>
 
 <script>

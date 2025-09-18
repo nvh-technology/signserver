@@ -60,7 +60,7 @@ class UserController extends Controller
 
                         if (empty($userName) && empty($credentialID)) {
                             $owner = Owner::find($ownerId);
-                            $fail("For owner '{$owner->name}', either User Name or Credential ID must be provided.");
+                            $fail(__('validation.custom.user.owner_credential_missing', ['owner_name' => $owner->name]));
                         }
                     }
                 },
@@ -97,7 +97,7 @@ class UserController extends Controller
             $user->owners()->sync($syncData);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('validation.custom.user.created_success'));
     }
 
     /**
@@ -149,7 +149,7 @@ class UserController extends Controller
 
                         if (empty($userName) && empty($credentialID)) {
                             $owner = Owner::find($ownerId);
-                            $fail("For owner '{$owner->name}', either User Name or Credential ID must be provided.");
+                            $fail(__('validation.custom.user.owner_credential_missing', ['owner_name' => $owner->name]));
                         }
                     }
                 },
@@ -195,7 +195,7 @@ class UserController extends Controller
             $user->owners()->detach(); // Detach all if no owners are selected
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('validation.custom.user.updated_success'));
     }
 
     /**
@@ -206,7 +206,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('validation.custom.user.deleted_success'));
     }
 
     public function editRoles(User $user)
@@ -224,7 +224,7 @@ class UserController extends Controller
 
         $user->syncRoles($request->roles);
 
-        return redirect()->route('admin.users.index')->with('success', 'User roles updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('validation.custom.user.roles_updated_success'));
     }
 
     public function backgroundSignature(User $user)

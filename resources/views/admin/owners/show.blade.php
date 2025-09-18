@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Owner Details')
+@section('title', 'Chi tiết tổ chức')
 
 @section('content')
-    <h1>Owner Details</h1>
+    <h1>Chi tiết tổ chức</h1>
 
     <div class="card mb-3">
         <div class="card-header">
-            Owner Information
+            Thông tin tổ chức
         </div>
         <div class="card-body">
             <h5 class="card-title">{{ $owner->name }}</h5>
@@ -16,24 +16,24 @@
                 @if ($owner->fileConfig)
                     <a href="{{ route('admin.owners.downloadConfig', $owner->id) }}" target="_blank">{{ basename($owner->fileConfig) }}</a>
                 @else
-                    N/A
+                    Không có
                 @endif
             </p>
             <p class="card-text"><strong>Keystore File:</strong>
                 @if ($owner->keystoreFile)
                     <a href="{{ route('admin.owners.downloadKeystore', $owner->id) }}" target="_blank">{{ basename($owner->keystoreFile) }}</a>
                 @else
-                    N/A
+                    Không có
                 @endif
             </p>
-            <p class="card-text"><strong>Created At:</strong> {{ $owner->created_at }}</p>
-            <p class="card-text"><strong>Updated At:</strong> {{ $owner->updated_at }}</p>
+            <p class="card-text"><strong>Ngày tạo:</strong> {{ $owner->created_at }}</p>
+            <p class="card-text"><strong>Ngày cập nhật:</strong> {{ $owner->updated_at }}</p>
         </div>
     </div>
 
     <div class="card">
         <div class="card-header">
-            Associated Users
+            Người dùng liên quan
         </div>
         <div class="card-body">
             @if ($owner->users->count() > 0)
@@ -43,10 +43,10 @@
                     @endforeach
                 </ul>
             @else
-                <p>No users associated with this owner.</p>
+                <p>Không có người dùng nào được liên kết với tổ chức này.</p>
             @endif
         </div>
     </div>
 
-    <a href="{{ route('admin.owners.index') }}" class="btn btn-secondary mt-3">Back to Owners</a>
+    <a href="{{ route('admin.owners.index') }}" class="btn btn-secondary mt-3">Quay lại danh sách tổ chức</a>
 @endsection

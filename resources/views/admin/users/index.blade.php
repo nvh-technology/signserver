@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Users')
+@section('title', 'Người dùng')
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Users</h1>
+        <h1>Người dùng</h1>
         @can('manage users')
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">Add New User</a>
+            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">Thêm người dùng mới</a>
         @endcan
     </div>
 
@@ -20,11 +20,11 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Username</th>
+                <th>Tên</th>
+                <th>Tên đăng nhập</th>
                 <th>Email</th>
-                <th>Background Signature</th>
-                <th>Actions</th>
+                <th>Chữ ký nền</th>
+                <th>Hành động</th>
             </tr>
         </thead>
         <tbody>
@@ -36,25 +36,25 @@
                     <td>{{ $user->email }}</td>
                     <td>
                         @if ($user->backgroundSignature)
-                            <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Background Signature" width="100">
+                            <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Chữ ký nền" width="100">
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info">View</a>
+                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info">Xem</a>
                         @can('manage users')
-                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="{{ route('admin.users.editRoles', $user->id) }}" class="btn btn-sm btn-secondary">Manage Roles</a>
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning">Sửa</a>
+                            <a href="{{ route('admin.users.editRoles', $user->id) }}" class="btn btn-sm btn-secondary">Quản lý vai trò</a>
                             <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn không?')">Xóa</button>
                             </form>
                         @endcan
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">No users found.</td>
+                    <td colspan="6">Không tìm thấy người dùng nào.</td>
                 </tr>
             @endforelse
         </tbody>

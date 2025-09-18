@@ -60,7 +60,7 @@ class OwnerController extends Controller
 
         $owner->save();
 
-        return redirect()->route('admin.owners.index')->with('success', 'Owner created successfully.');
+        return redirect()->route('admin.owners.index')->with('success', __('validation.custom.owner.created_success'));
     }
 
     /**
@@ -132,7 +132,7 @@ class OwnerController extends Controller
 
         $owner->save();
 
-        return redirect()->route('admin.owners.index')->with('success', 'Owner updated successfully.');
+        return redirect()->route('admin.owners.index')->with('success', __('validation.custom.owner.updated_success'));
     }
 
     /**
@@ -149,13 +149,13 @@ class OwnerController extends Controller
         }
         $owner->delete();
 
-        return redirect()->route('admin.owners.index')->with('success', 'Owner deleted successfully.');
+        return redirect()->route('admin.owners.index')->with('success', __('validation.custom.owner.deleted_success'));
     }
 
     public function downloadConfig(Owner $owner)
     {
         if (!$owner->fileConfig || !Storage::disk('local')->exists($owner->fileConfig)) {
-            abort(404, 'File not found.');
+            abort(404, __('validation.custom.owner.file_not_found'));
         }
 
         return Storage::disk('local')->download($owner->fileConfig);
@@ -164,7 +164,7 @@ class OwnerController extends Controller
     public function downloadKeystore(Owner $owner)
     {
         if (!$owner->keystoreFile || !Storage::disk('local')->exists($owner->keystoreFile)) {
-            abort(404, 'File not found.');
+            abort(404, __('validation.custom.owner.file_not_found'));
         }
 
         return Storage::disk('local')->download($owner->keystoreFile);

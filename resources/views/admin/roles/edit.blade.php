@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Role')
+@section('title', 'Chỉnh sửa vai trò')
 
 @section('content')
-    <h1>Edit Role: {{ $role->name }}</h1>
+    <h1>Chỉnh sửa vai trò: {{ $role->name }}</h1>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -19,12 +19,12 @@
         @csrf
         @method('PUT')
         <div class="mb-3">
-            <label for="name" class="form-label">Role Name</label>
+            <label for="name" class="form-label">Tên vai trò</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $role->name) }}" required>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Permissions</label>
+            <label class="form-label">Quyền</label>
             @foreach ($permissions as $permission)
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="permission_{{ $permission->id }}" {{ (in_array($permission->name, old('permissions', $role->permissions->pluck('name')->toArray()))) ? 'checked' : '' }}>
@@ -35,7 +35,7 @@
             @endforeach
         </div>
 
-        <button type="submit" class="btn btn-primary">Update Role</button>
-        <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Cập nhật vai trò</button>
+        <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Hủy</a>
     </form>
 @endsection
