@@ -99,12 +99,12 @@
                                 <div class="mb-3">
                                     <label for="reason" class="form-label">Lý do ký</label>
                                     <input type="text" class="form-control" id="reason" name="reason"
-                                        value="Ký hợp đồng điện tử">
+                                        value="Ký số điện tử">
                                 </div>
                                 <div class="mb-3">
                                     <label for="location" class="form-label">Nơi ký</label>
                                     <input type="text" class="form-control" id="location" name="location"
-                                        value="Hồ Chí Minh">
+                                        value="Tp. Hồ Chí Minh">
                                 </div>
                             </div>
 
@@ -197,8 +197,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-light p-0">
-                    <div id="pdf-viewer"
-                        style="overflow-y: scroll;overflow-x: clip;max-height: 75vh;"></div>
+                    <div id="pdf-viewer" style="overflow-y: scroll;overflow-x: clip;max-height: 75vh;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -510,9 +509,11 @@
                         const halfHeight = signatureBoxSize.height / 2;
 
                         if (pdfX - halfWidth < 0) pdfX = halfWidth;
-                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width - halfWidth;
+                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width -
+                            halfWidth;
                         if (pdfY - halfHeight < 0) pdfY = halfHeight;
-                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height - halfHeight;
+                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height -
+                            halfHeight;
 
                         const llx = Math.round(pdfX - halfWidth);
                         const lly = Math.round(pdfY - halfHeight);
