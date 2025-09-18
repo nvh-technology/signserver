@@ -16,6 +16,11 @@
                         {{ __('Your password has been updated.') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
+                @elseif (session('status') === 'passcode-updated')
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ __('Your passcode has been updated.') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 @endif
 
                 <!-- Profile Information Form -->
@@ -124,50 +129,50 @@
                     </div>
                 </div>
 
-                <!-- Delete User Form -->
+                <!-- Update Passcode Form -->
                 <div class="card mb-4 shadow-sm">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">{{ __('Delete Account') }}</h5>
-                        <p class="card-text text-muted">{{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}</p>
+                        <h5 class="card-title mb-0">{{ __('Update Passcode') }}</h5>
+                        <p class="card-text text-muted">{{ __('Ensure your account is using a 6-digit passcode.') }}</p>
                     </div>
                     <div class="card-body">
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmUserDeletionModal">
-                            {{ __('Delete Account') }}
-                        </button>
+                        <form method="post" action="{{ route('profile.passcode.update') }}" class="mt-4">
+                            @csrf
+                            @method('put')
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="confirmUserDeletionModal" tabindex="-1" aria-labelledby="confirmUserDeletionModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <form method="post" action="{{ route('profile.destroy') }}">
-                                        @csrf
-                                        @method('delete')
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="confirmUserDeletionModalLabel">{{ __('Are you sure you want to delete your account?') }}</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p class="text-muted">
-                                                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
-                                            </p>
-                                            <div class="mb-3 mt-4">
-                                                <label for="password" class="visually-hidden">{{ __('Password') }}</label>
-                                                <input id="password" name="password" type="password" class="form-control" placeholder="{{ __('Password') }}">
-                                                @error('password', 'userDeletion')
-                                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                                            <button type="submit" class="btn btn-danger">{{ __('Delete Account') }}</button>
-                                        </div>
-                                    </form>
-                                </div>
+                            @if (Auth::user()->passcode)
+                            <div class="mb-3">
+                                <label for="current_passcode" class="form-label">{{ __('Current Passcode') }}</label>
+                                <input id="current_passcode" name="current_passcode" type="password" class="form-control" autocomplete="current-passcode" maxlength="6">
+                                @error('current_passcode', 'updatePasscode')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
                             </div>
-                        </div>
+                            @endif
+
+                            <div class="mb-3">
+                                <label for="passcode" class="form-label">{{ __('New Passcode') }}</label>
+                                <input id="passcode" name="passcode" type="password" class="form-control" autocomplete="new-passcode" maxlength="6">
+                                @error('passcode', 'updatePasscode')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="passcode_confirmation" class="form-label">{{ __('Confirm Passcode') }}</label>
+                                <input id="passcode_confirmation" name="passcode_confirmation" type="password" class="form-control" autocomplete="new-passcode" maxlength="6">
+                                @error('passcode_confirmation', 'updatePasscode')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                                <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

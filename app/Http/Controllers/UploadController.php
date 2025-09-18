@@ -7,6 +7,7 @@ use App\Models\OwnerUser;
 use App\Models\UserFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UploadController extends Controller
 {
@@ -35,7 +36,22 @@ class UploadController extends Controller
             // 'file_to_sign' => 'required|max:10240', // Max 10MB
             // 'file_to_sign' => 'required|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // Max 10MB
             'owner_id' => 'required|exists:owners,id',
+            'passcode' => 'required|string',
         ]);
+
+        $user = Auth::user();
+
+        // Check if user has a passcode
+        if ($user->passcode) {
+            // If yes, check if the provided passcode is correct
+            if (!Hash::check($request->passcode, $user->passcode)) {
+                return back()->with('fail', 'Invalid passcode.');
+            }
+        } else {
+            // If no, this is the new passcode, so hash and save it
+            $user->passcode = Hash::make($request->passcode);
+            $user->save();
+        }
 
         $file = $request->file('file_to_sign');
         $fileName = $file->getClientOriginalName();

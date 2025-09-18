@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -35,6 +36,37 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the user's passcode.
+     */
+    public function updatePasscode(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $rules = [
+            'passcode' => ['required', 'string', 'confirmed'],
+        ];
+
+        if ($user->passcode) {
+            $rules['current_passcode'] = ['required', function ($attribute, $value, $fail) use ($user) {
+                if (!Hash::check($value, $user->passcode)) {
+                    $fail('The provided current passcode does not match your actual passcode.');
+                }
+            }];
+        }
+
+        $validated = $request->validate($rules, [
+            'current_passcode.required' => __('Please enter your current passcode.'),
+            'passcode.required' => __('Please enter a new passcode.'),
+            'passcode.confirmed' => __('The new passcode confirmation does not match.'),
+        ]);
+
+        $user->passcode = Hash::make($validated['passcode']);
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'passcode-updated');
     }
 
     /**

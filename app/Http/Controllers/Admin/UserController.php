@@ -40,6 +40,7 @@ class UserController extends Controller
             'username' => 'required|unique:users',
             'email' => 'nullable|email|unique:users',
             'password' => 'required|min:8',
+            'passcode' => 'required|string',
             'owners' => 'array',
             'owners.*' => 'exists:owners,id',
             'owner_pivot' => 'array',
@@ -71,6 +72,7 @@ class UserController extends Controller
             'username' => $validatedData['username'],
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
+            'passcode' => bcrypt($validatedData['passcode']),
         ]);
 
         if ($request->hasFile('backgroundSignature')) {
@@ -127,6 +129,7 @@ class UserController extends Controller
             'username' => 'required|unique:users,username,' . $id,
             'email' => 'nullable|email|unique:users,email,' . $id,
             'password' => 'nullable|min:8',
+            'passcode' => 'required|string',
             'owners' => 'array',
             'owners.*' => 'exists:owners,id',
             'owner_pivot' => 'array',
@@ -160,6 +163,8 @@ class UserController extends Controller
         if ($request->filled('password')) {
             $user->password = bcrypt($validatedData['password']);
         }
+        // Passcode is now required, so no need for filled check
+        $user->passcode = bcrypt($validatedData['passcode']);
 
         if ($request->hasFile('backgroundSignature')) {
             // Delete old background if it exists

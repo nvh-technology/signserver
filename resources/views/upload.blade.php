@@ -200,7 +200,34 @@
                     <div id="pdf-viewer" style="overflow-y: scroll;overflow-x: clip;max-height: 75vh;"></div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passcode Modal -->
+    <div class="modal fade" id="passcode-modal" tabindex="-1" aria-labelledby="passcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passcodeModalLabel">Xác nhận Passcode</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passcode-form">
+                        <div class="mb-3">
+                            <label for="passcode" class="form-label">Passcode</label>
+                            <input type="password" class="form-control" id="passcode" name="passcode" required autocomplete="current-password">
+                        </div>
+                        <div class="alert alert-info">
+                            Nếu bạn chưa có passcode, passcode bạn nhập sẽ được dùng làm passcode mới.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="confirm-passcode-btn">Xác nhận</button>
                 </div>
             </div>
         </div>
@@ -221,6 +248,10 @@
         const selectedPositionInfo = document.getElementById('selected-position-info');
         const pdfModal = document.getElementById('pdf-modal'); // Thêm ID modal
         const signBtn = document.getElementById('sign-btn');
+        const passcodeModal = new bootstrap.Modal(document.getElementById('passcode-modal'));
+        const confirmPasscodeBtn = document.getElementById('confirm-passcode-btn');
+        const passcodeForm = document.getElementById('passcode-form');
+        const uploadForm = document.getElementById('upload-form-sign');
 
         // Khai báo các biến trạng thái
         let pdfDoc = null;
@@ -528,14 +559,35 @@
             }
         }
 
-        document.querySelector('#upload-form-sign').addEventListener('submit', function(e) {
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Ngăn form submit ngay lập tức
+
             const fileName = fileInput.files[0].name;
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (fileExtension === 'pdf' && !signaturePositionInput.value) {
-                // Bạn có thể bật lại tính năng này nếu muốn bắt buộc chọn vị trí
-                e.preventDefault();
                 alert('Vui lòng chọn vị trí ký');
+                return; // Dừng lại nếu là file PDF và chưa chọn vị trí
             }
+
+            passcodeModal.show(); // Hiển thị modal nhập passcode
+        });
+
+        confirmPasscodeBtn.addEventListener('click', function() {
+            const passcode = document.getElementById('passcode').value;
+            if (!passcode) {
+                alert('Vui lòng nhập passcode.');
+                return;
+            }
+
+            // Thêm passcode vào form chính
+            const passcodeHiddenInput = document.createElement('input');
+            passcodeHiddenInput.type = 'hidden';
+            passcodeHiddenInput.name = 'passcode';
+            passcodeHiddenInput.value = passcode;
+            uploadForm.appendChild(passcodeHiddenInput);
+
+            passcodeModal.hide();
+            uploadForm.submit(); // Submit form chính
         });
     </script>
 @endpush

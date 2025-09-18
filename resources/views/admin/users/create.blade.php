@@ -34,6 +34,10 @@
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
         <div class="mb-3">
+            <label for="passcode" class="form-label">Passcode (6 digits)</label>
+            <input type="password" class="form-control" id="passcode" name="passcode" maxlength="6">
+        </div>
+        <div class="mb-3">
             <label for="backgroundSignature" class="form-label">Background Signature (PNG only)</label>
             <input type="file" class="form-control" id="backgroundSignature" name="backgroundSignature" accept=".png">
         </div>
