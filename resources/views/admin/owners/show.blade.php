@@ -3,7 +3,15 @@
 @section('title', 'Chi tiết tổ chức')
 
 @section('content')
-    <h1>Chi tiết tổ chức</h1>
+        <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Home') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.owners.index') }}">{{ __('Owners') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('Show') }}</li>
+        </ol>
+    </nav>
+
+    <h2>Chi tiết tổ chức</h2>
 
     <div class="card mb-3">
         <div class="card-header">

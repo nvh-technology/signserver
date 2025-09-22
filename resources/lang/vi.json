@@ -18,8 +18,9 @@
     "New Password": "Mật khẩu mới",
     "Confirm Password": "Xác nhận mật khẩu",
     "Update Passcode": "Cập nhật mã bảo vệ",
-    "Ensure your account is using a 6-digit passcode.": "Đảm bảo tài khoản của bạn đang sử dụng mã bảo vệ 6 chữ số.",
+    "Ensure your account is using a 4-digit passcode.": "Đảm bảo tài khoản của bạn đang sử dụng mã bảo vệ 4 chữ số.",
     "Current Passcode": "Mã bảo vệ hiện tại",
     "New Passcode": "Mã bảo vệ mới",
-    "Confirm Passcode": "Xác nhận mã bảo vệ"
+    "Confirm Passcode": "Xác nhận mã bảo vệ",
+    "Back":"Quay lại"
 }

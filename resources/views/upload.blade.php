@@ -152,7 +152,7 @@
                                 <input type="text" class="form-control" id="username" name="username"
                                     value="{{ old('username') }}" required autofocus>
                                 @error('username')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                    <div class="text-danger mt-2">{{ __($message) }}</div>
                                 @enderror
                             </div>
 
@@ -161,7 +161,7 @@
                                 <input type="password" class="form-control" id="password" name="password" required
                                     autocomplete="current-password">
                                 @error('password')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                    <div class="text-danger mt-2">{{ __($message) }}</div>
                                 @enderror
                             </div>
 
@@ -174,12 +174,12 @@
                                 <button type="submit" class="btn btn-primary btn-lg">Đăng nhập</button>
                             </div>
 
-                            @if (Route::has('password.request'))
+                            {{-- @if (Route::has('password.request'))
                                 <div class="text-center mt-3">
                                     <a class="text-decoration-none" href="{{ route('password.request') }}">Quên mật
                                         khẩu?</a>
                                 </div>
-                            @endif
+                            @endif --}}
                         </form>
                     </div>
                 @endguest
@@ -211,18 +211,21 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="passcodeModalLabel">Xác nhận Passcode</h5>
+                    <h5 class="modal-title" id="passcodeModalLabel">Xác nhận mã bảo vệ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
                     <form id="passcode-form">
                         <div class="mb-3">
-                            <label for="passcode" class="form-label">Passcode</label>
-                            <input type="password" class="form-control" id="passcode" name="passcode" required autocomplete="current-password">
+                            <label for="passcode" class="form-label">Mã bảo vệ</label>
+                            <input type="password" class="form-control" id="passcode" name="passcode" required
+                                maxlength="4">
                         </div>
-                        <div class="alert alert-info">
-                            Nếu bạn chưa có passcode, passcode bạn nhập sẽ được dùng làm passcode mới.
-                        </div>
+                        @if (!request()->user()->passcode)
+                            <div class="alert alert-info">
+                                Nếu bạn chưa có mã bảo vệ, mã bảo vệ bạn nhập sẽ được dùng làm mã bảo vệ mới.
+                            </div>
+                        @endif
                     </form>
                 </div>
                 <div class="modal-footer">

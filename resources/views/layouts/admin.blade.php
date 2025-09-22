@@ -10,7 +10,7 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
+        <div class="container">
             <a class="navbar-brand" href="/">Quản trị</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Chuyển đổi điều hướng">
@@ -35,7 +35,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container py-5">
         @yield('content')
     </div>
 

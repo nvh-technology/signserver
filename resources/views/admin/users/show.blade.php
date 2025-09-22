@@ -3,7 +3,15 @@
 @section('title', 'Chi tiết người dùng')
 
 @section('content')
-    <h1>Chi tiết người dùng</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Home') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">{{ __('Users') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('Show') }}</li>
+        </ol>
+    </nav>
+
+    <h2>Chi tiết người dùng</h2>
 
     <div class="card mb-3">
         <div class="card-header">
@@ -11,7 +19,7 @@
         </div>
         <div class="card-body">
             <h5 class="card-title">{{ $user->name }}</h5>
-            <p class="card-text"><strong>ID:</strong> {{ $user->id }}</p>
+            <p class="card-text"><strong>Tên đăng nhập:</strong> {{ $user->username }}</p>
             <p class="card-text"><strong>Email:</strong> {{ $user->email }}</p>
             <p class="card-text"><strong>Ngày tạo:</strong> {{ $user->created_at }}</p>
             <p class="card-text"><strong>Ngày cập nhật:</strong> {{ $user->updated_at }}</p>
