@@ -221,7 +221,7 @@
                             <input type="password" class="form-control" id="passcode" name="passcode" required
                                 maxlength="4">
                         </div>
-                        @if (!request()->user()->passcode)
+                        @if (request()->user() && !request()->user()->passcode)
                             <div class="alert alert-info">
                                 Nếu bạn chưa có mã bảo vệ, mã bảo vệ bạn nhập sẽ được dùng làm mã bảo vệ mới.
                             </div>
