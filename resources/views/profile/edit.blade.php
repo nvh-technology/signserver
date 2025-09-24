@@ -47,6 +47,61 @@
                     </div>
                 @endif
 
+                @error('current_password', 'updatePassword')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('password', 'updatePassword')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('password_confirmation', 'updatePassword')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('current_passcode', 'updatePasscode')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('passcode', 'updatePasscode')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('passcode_confirmation', 'updatePasscode')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('name')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('username')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+                @error('email')
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                    </div>
+                @enderror
+
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
@@ -102,7 +157,8 @@
                                     <div class="mb-3">
                                         <label for="name" class="form-label">{{ __('Name') }}</label>
                                         <input id="name" name="name" type="text" class="form-control"
-                                            value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
+                                            value="{{ old('name', $user->name) }}" required autofocus
+                                            autocomplete="name">
                                         @error('name')
                                             <div class="text-danger mt-2">{{ $message }}</div>
                                         @enderror
@@ -199,6 +255,7 @@
                                     </div>
                                 </form>
                             </div>
+
                             <div class="tab-pane fade" id="passcode-tab-pane" role="tabpanel"
                                 aria-labelledby="passcode-tab" tabindex="0">
 
@@ -251,7 +308,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
