@@ -211,19 +211,19 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="passcodeModalLabel">Xác nhận mã bảo vệ</h5>
+                    <h5 class="modal-title" id="passcodeModalLabel">Nhập mã OTP ký số (4 số)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
                     <form id="passcode-form">
                         <div class="mb-3">
-                            <label for="passcode" class="form-label">Mã bảo vệ</label>
+                            <label for="passcode" class="form-label">Mã OTP</label>
                             <input type="password" class="form-control" id="passcode" name="passcode" required
                                 maxlength="4">
                         </div>
                         @if (request()->user() && !request()->user()->passcode)
                             <div class="alert alert-info">
-                                Nếu bạn chưa có mã bảo vệ, mã bảo vệ bạn nhập sẽ được dùng làm mã bảo vệ mới.
+                                Nếu bạn chưa có mã OTP ký số, mã OTP ký số bạn nhập sẽ được dùng làm mã OTP ký số mới.
                             </div>
                         @endif
                     </form>
@@ -580,7 +580,7 @@
         confirmPasscodeBtn.addEventListener('click', function() {
             const passcode = document.getElementById('passcode').value;
             if (!passcode) {
-                alert('Vui lòng nhập mã bảo vệ.');
+                alert('Vui lòng nhập mã OTP.');
                 return;
             }
 

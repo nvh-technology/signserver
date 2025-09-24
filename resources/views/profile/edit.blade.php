@@ -11,7 +11,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ __('Profile') }}</li>
                         </ol>
                     </nav>
-                    <a href="{{ url()->previous() }}" class="btn btn-sm btn-secondary">{{ __('Back') }}</a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-sm btn-secondary">{{ __('Back') }}</a>
                 </div>
 
                 <h2 class="mb-4">{{ __('Profile') }}</h2>
@@ -112,7 +112,7 @@
                                         <label for="username" class="form-label">{{ __('Username') }}</label>
                                         <input id="username" name="username" type="text" class="form-control"
                                             value="{{ old('username', $user->username) }}" required
-                                            autocomplete="username">
+                                            autocomplete="username" disabled>
                                         @error('username')
                                             <div class="text-danger mt-2">{{ $message }}</div>
                                         @enderror

@@ -131,8 +131,8 @@ return [
             'exists' => 'ID chủ sở hữu đã chọn không hợp lệ.',
         ],
         'passcode' => [
-            'required' => 'Mã bảo vệ là bắt buộc.',
-            'string' => 'Mã bảo vệ phải là một chuỗi.',
+            'required' => 'Mã OTP là bắt buộc.',
+            'string' => 'Mã OTP phải là một chuỗi.',
         ],
         'file_to_sign' => [
             'required' => 'Tệp cần ký là bắt buộc.',
@@ -140,14 +140,14 @@ return [
             'mimes' => 'Tệp cần ký phải là một trong các loại: :values.',
         ],
         'fail' => [
-            'invalid_passcode' => 'Mã bảo vệ không hợp lệ.',
+            'invalid_passcode' => 'Mã OTP không hợp lệ.',
             'not_associated_with_owner' => 'Bạn không được liên kết với chủ sở hữu đã chọn.',
         ],
         'passcode_update' => [
-            'current_passcode_mismatch' => 'Mã bảo vệ hiện tại được cung cấp không khớp với mã bảo vệ thực tế của bạn.',
-            'current_passcode_required' => 'Vui lòng nhập mã bảo vệ hiện tại của bạn.',
-            'new_passcode_required' => 'Vui lòng nhập mã bảo vệ mới.',
-            'new_passcode_confirmed' => 'Xác nhận mã bảo vệ mới không khớp.',
+            'current_passcode_mismatch' => 'Mã OTP hiện tại được cung cấp không khớp với mã OTP thực tế của bạn.',
+            'current_passcode_required' => 'Vui lòng nhập mã OTP hiện tại của bạn.',
+            'new_passcode_required' => 'Vui lòng nhập mã OTP mới.',
+            'new_passcode_confirmed' => 'Xác nhận mã OTP mới không khớp.',
         ],
         'owner' => [
             'created_success' => 'Chủ sở hữu đã được tạo thành công.',
@@ -182,9 +182,9 @@ return [
 
     'attributes' => [
         'owner_id' => 'ID chủ sở hữu',
-        'passcode' => 'Mã bảo vệ',
+        'passcode' => 'Mã OTP',
         'file_to_sign' => 'Tệp cần ký',
-        'current_passcode' => 'Mã bảo vệ hiện tại',
+        'current_passcode' => 'Mã OTP hiện tại',
         'name' => 'Tên',
         'username' => 'Tên người dùng',
         'email' => 'Email',
@@ -195,7 +195,7 @@ return [
         'owners.*' => 'Chủ sở hữu',
         'owner_pivot' => 'Thông tin xoay vòng chủ sở hữu',
         'owner_pivot.*.userName' => 'Tên người dùng chủ sở hữu',
-        'owner_pivot.*.passcode' => 'Mã bảo vệ chủ sở hữu',
+        'owner_pivot.*.passcode' => 'Mã OTP chủ sở hữu',
         'owner_pivot.*.credentialID' => 'Credential ID chủ sở hữu',
         'backgroundSignature' => 'Chữ ký nền',
         'roles' => 'Vai trò',

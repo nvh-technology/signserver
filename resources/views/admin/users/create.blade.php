@@ -49,7 +49,7 @@
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <div class="mb-3">
-                    <label for="passcode" class="form-label">Mã bảo vệ (4 chữ số)</label>
+                    <label for="passcode" class="form-label">Mã OTP (4 chữ số)</label>
                     <input type="password" class="form-control" id="passcode" name="passcode" maxlength="4">
                 </div>
                 <div class="mb-3">

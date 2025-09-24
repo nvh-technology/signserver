@@ -49,7 +49,7 @@
                             <strong>{{ $owner->name }}</strong> (ID: {{ $owner->id }})
                             <ul>
                                 <li>Tên người dùng: {{ $owner->pivot->userName }}</li>
-                                <li>Mã bảo vệ: {{ $owner->pivot->passcode }}</li>
+                                <li>Mã OTP: {{ $owner->pivot->passcode }}</li>
                                 <li>Credential ID: {{ $owner->pivot->credentialID }}</li>
                             </ul>
                         </li>
