@@ -20,7 +20,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         $user = $request->user();
-        
+
         $userFiles = UserFile::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->paginate(50);
@@ -109,13 +109,14 @@ class ProfileController extends Controller
             abort(403);
         }
 
+        $fileName = $userFile->original_file_name;
         $filePath = $userFile->signed_file_path;
 
         if (!file_exists($filePath)) {
             return back()->with('fail', 'File not found.');
         }
 
-        return response()->download($filePath);
+        return Storage::download($filePath, 'signed.'.$fileName);
     }
 
     /**
