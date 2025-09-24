@@ -12,7 +12,15 @@
     </nav>
 
     <h2>Chi tiết người dùng</h2>
-
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="card shadow-lg">
         <div class="card-header py-3">
             <ul class="nav nav-pills" id="myTab" role="tablist">

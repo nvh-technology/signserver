@@ -108,18 +108,19 @@ class ProfileController extends Controller
     public function downloadSignedFile(UserFile $userFile)
     {
         // Ensure the user is authorized to download the file
-        if ($userFile->user_id !== Auth::id() || !Auth::user()->hasRole('admin')) {
+        if ($userFile->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             abort(403);
         }
 
         $fileName = $userFile->original_file_name;
         $filePath = $userFile->signed_file_path;
 
-        if (!Storage::exists($filePath)) {
+        if (!file_exists($filePath)) {
             return back()->with('fail', 'File not found.');
         }
 
-        return Storage::download($filePath, 'signed.'.$fileName);
+        return response()->download($filePath, 'signed.'.$fileName);
+
     }
 
     /**
@@ -128,7 +129,7 @@ class ProfileController extends Controller
     public function downloadOriginalFile(UserFile $userFile)
     {
         // Ensure the user is authorized to download the file
-        if ($userFile->user_id !== Auth::id() || !Auth::user()->hasRole('admin')) {
+        if ($userFile->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             abort(403);
         }
 
