@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\UserFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,8 +19,15 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        
+        $userFiles = UserFile::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(50);
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'userFiles' => $userFiles,
         ]);
     }
 
@@ -88,5 +97,44 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Download the signed file.
+     */
+    public function downloadSignedFile(UserFile $userFile)
+    {
+        // Ensure the user is authorized to download the file
+        if ($userFile->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $filePath = $userFile->signed_file_path;
+
+        if (!file_exists($filePath)) {
+            return back()->with('fail', 'File not found.');
+        }
+
+        return response()->download($filePath);
+    }
+
+    /**
+     * Download the original file.
+     */
+    public function downloadOriginalFile(UserFile $userFile)
+    {
+        // Ensure the user is authorized to download the file
+        if ($userFile->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $filePath = $userFile->original_file_path;
+        $fileName = $userFile->original_file_name;
+
+        if (!Storage::exists($filePath)) {
+            return back()->with('fail', 'File not found.');
+        }
+
+        return Storage::download($filePath, $fileName);
     }
 }

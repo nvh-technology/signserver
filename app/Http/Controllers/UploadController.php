@@ -8,6 +8,7 @@ use App\Models\UserFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
@@ -97,6 +98,11 @@ class UploadController extends Controller
         } else {
             // Signing failed, return with the error message from the helper
             $errorMessage = $result;
+
+            if (Storage::exists($originalFilePath)) {
+                Storage::delete($originalFilePath);
+            }
+            
             return back()->with('fail', $errorMessage);
         }
     }

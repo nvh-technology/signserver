@@ -31,7 +31,7 @@
                             <img src="{{ asset('images/logo.jpg') }}" style="max-height: 80px;" class="img-fluid" alt="">
                         </span>
                     </a>
-                    <div class="w-100 text-end">
+                    <div class="text-end" style="width: 90%;">
                         @if (request()->user())
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Owner;
+use App\Models\UserFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -105,7 +106,8 @@ class UserController extends Controller
     public function show(string $id)
     {
         $user = User::findOrFail($id);
-        return view('admin.users.show', compact('user'));
+        $userFiles = UserFile::where('user_id', $id)->latest()->paginate(50);
+        return view('admin.users.show', compact('user', 'userFiles'));
     }
 
     /**

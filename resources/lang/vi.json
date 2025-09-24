@@ -22,5 +22,14 @@
     "Current Passcode": "Mã OTP hiện tại",
     "New Passcode": "Mã OTP mới",
     "Confirm Passcode": "Xác nhận mã OTP",
-    "Back":"Quay lại"
+    "Back":"Quay lại",
+    "File History": "Lịch sử tệp",
+    "File Name": "Tên tệp",
+    "Signed At": "Thời gian ký",
+    "Actions": "Hành động",
+    "Download": "Tải xuống",
+    "Download Signed": "Tải xuống tệp đã ký",
+    "Download Original": "Tải xuống tệp gốc",
+    "No files found.": "Không tìm thấy tệp nào.",
+    "User Details": "Chi tiết người dùng"
 }

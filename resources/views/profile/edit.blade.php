@@ -133,6 +133,12 @@
                                     aria-controls="passcode-tab-pane"
                                     aria-selected="false">{{ __('Update Passcode') }}</button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="history-tab" data-bs-toggle="tab"
+                                    data-bs-target="#history-tab-pane" type="button" role="tab"
+                                    aria-controls="history-tab-pane"
+                                    aria-selected="false">{{ __('File History') }}</button>
+                            </li>
                         </ul>
                     </div>
                     <div class="card-body">
@@ -305,6 +311,40 @@
                                     </div>
                                 </form>
                             </div>
+
+                            <div class="tab-pane fade" id="history-tab-pane" role="tabpanel"
+                                aria-labelledby="history-tab" tabindex="0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ __('File Name') }}</th>
+                                                <th>{{ __('Signed At') }}</th>
+                                                <th>{{ __('Actions') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($userFiles as $file)
+                                                <tr>
+                                                    <td>{{ $file->original_file_name }}</td>
+                                                    <td>{{ $file->created_at->format('d/m/Y H:i:s') }}</td>
+                                                    <td>
+                                                        <a href="{{ route('user-files.download', $file) }}" class="btn btn-sm btn-primary">{{ __('Download Signed') }}</a>
+                                                        <a href="{{ route('user-files.download-original', $file) }}" class="btn btn-sm btn-secondary">{{ __('Download Original') }}</a>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="text-center">{{ __('No files found.') }}</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    {{ $userFiles->links() }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -312,3 +352,25 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            tabButtons.forEach(button => {
+                button.addEventListener('shown.bs.tab', event => {
+                    localStorage.setItem('activeProfileTab', event.target.id);
+                });
+            });
+
+            const savedTabId = localStorage.getItem('activeProfileTab');
+            if (savedTabId) {
+                const savedTab = document.getElementById(savedTabId);
+                if (savedTab) {
+                    const tab = new bootstrap.Tab(savedTab);
+                    tab.show();
+                }
+            }
+        });
+    </script>
+@endpush
