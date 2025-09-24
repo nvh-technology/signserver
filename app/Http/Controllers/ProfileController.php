@@ -112,7 +112,7 @@ class ProfileController extends Controller
         $fileName = $userFile->original_file_name;
         $filePath = $userFile->signed_file_path;
 
-        if (!file_exists($filePath)) {
+        if (!Storage::exists($filePath)) {
             return back()->with('fail', 'File not found.');
         }
 
