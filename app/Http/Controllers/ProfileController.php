@@ -59,11 +59,14 @@ class ProfileController extends Controller
         ];
 
         if ($user->passcode) {
-            $rules['current_passcode'] = ['required', function ($attribute, $value, $fail) use ($user) {
-                if (!Hash::check($value, $user->passcode)) {
-                    $fail(__('validation.custom.passcode_update.current_passcode_mismatch'));
+            $rules['current_passcode'] = [
+                'required',
+                function ($attribute, $value, $fail) use ($user) {
+                    if (!Hash::check($value, $user->passcode)) {
+                        $fail(__('validation.custom.passcode_update.current_passcode_mismatch'));
+                    }
                 }
-            }];
+            ];
         }
 
         $validated = $request->validate($rules, [
@@ -105,7 +108,7 @@ class ProfileController extends Controller
     public function downloadSignedFile(UserFile $userFile)
     {
         // Ensure the user is authorized to download the file
-        if ($userFile->user_id !== Auth::id()) {
+        if ($userFile->user_id !== Auth::id() || Auth::user()->hasRole('admin')) {
             abort(403);
         }
 
@@ -116,7 +119,7 @@ class ProfileController extends Controller
             return back()->with('fail', 'File not found.');
         }
 
-        return Storage::download($filePath, 'signed.'.$fileName);
+        return Storage::download($filePath, $fileName);
     }
 
     /**
@@ -125,7 +128,7 @@ class ProfileController extends Controller
     public function downloadOriginalFile(UserFile $userFile)
     {
         // Ensure the user is authorized to download the file
-        if ($userFile->user_id !== Auth::id()) {
+        if ($userFile->user_id !== Auth::id() || Auth::user()->hasRole('admin')) {
             abort(403);
         }
 
