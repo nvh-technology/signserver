@@ -290,7 +290,7 @@
                                     <div class="mb-3">
                                         <label for="passcode" class="form-label">{{ __('New Passcode') }}</label>
                                         <input id="passcode" name="passcode" type="password" class="form-control"
-                                            autocomplete="new-passcode" maxlength="6">
+                                            autocomplete="new-passcode" maxlength="4">
                                         @error('passcode', 'updatePasscode')
                                             <div class="text-danger mt-2">{{ $message }}</div>
                                         @enderror
@@ -300,7 +300,7 @@
                                         <label for="passcode_confirmation"
                                             class="form-label">{{ __('Confirm Passcode') }}</label>
                                         <input id="passcode_confirmation" name="passcode_confirmation" type="password"
-                                            class="form-control" autocomplete="new-passcode" maxlength="6">
+                                            class="form-control" autocomplete="new-passcode" maxlength="4">
                                         @error('passcode_confirmation', 'updatePasscode')
                                             <div class="text-danger mt-2">{{ $message }}</div>
                                         @enderror
