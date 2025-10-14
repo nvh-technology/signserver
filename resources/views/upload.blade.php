@@ -188,19 +188,64 @@
         </div>
     </div>
 
-    <!-- PDF Modal -->
+    <!-- PDF Modal Fullscreen -->
     <div class="modal fade" id="pdf-modal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="pdfModalLabel">Chọn vị trí ký</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
-                <div class="modal-body bg-light p-0">
-                    <div id="pdf-viewer" style="overflow-y: scroll;overflow-x: clip;max-height: 75vh;"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <div class="modal-body p-0 d-flex">
+                    <!-- Sidebar Form Ký -->
+                    <div class="bg-white border-end" style="width: 350px; overflow-y: auto;">
+                        <div class="p-4">
+                            <h6 class="mb-3">Thông tin ký</h6>
+
+                            <div class="mb-3">
+                                <label for="modal-owner-id" class="form-label">Tổ chức</label>
+                                <select class="form-select" id="modal-owner-id" name="owner_id" required>
+                                    @foreach ($owners as $owner)
+                                        <option value="{{ $owner->id }}">{{ $owner->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="modal-reason" class="form-label">Lý do ký</label>
+                                <input type="text" class="form-control" id="modal-reason" name="reason"
+                                    value="Ký số điện tử">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="modal-location" class="form-label">Nơi ký</label>
+                                <input type="text" class="form-control" id="modal-location" name="location"
+                                    value="Tp. Hồ Chí Minh">
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-primary btn-lg" id="modal-sign-btn">
+                                    Ký dữ liệu
+                                </button>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="alert alert-info mb-0">
+                                <small>
+                                    <strong>Hướng dẫn:</strong><br>
+                                    1. Nhấp vào vị trí trên PDF để đặt chữ ký<br>
+                                    2. Kéo thả để điều chỉnh vị trí<br>
+                                    3. Nhập thông tin và nhấn "Ký dữ liệu"
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PDF Viewer Area -->
+                    <div class="flex-grow-1 bg-light p-3" style="overflow-y: auto; overflow-x: clip;">
+                        <div id="pdf-viewer"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -256,6 +301,12 @@
         const passcodeForm = document.getElementById('passcode-form');
         const uploadForm = document.getElementById('upload-form-sign');
 
+        // Sidebar modal elements
+        const modalSignBtn = document.getElementById('modal-sign-btn');
+        const modalOwnerId = document.getElementById('modal-owner-id');
+        const modalReason = document.getElementById('modal-reason');
+        const modalLocation = document.getElementById('modal-location');
+
         // Khai báo các biến trạng thái
         let pdfDoc = null;
         let selectedPage = null;
@@ -300,6 +351,10 @@
                     pdfOptions.style.display = 'block';
                     selectPosBtn.style.display = 'block';
                     signBtn.style.display = 'none';
+
+                    // Tự động mở modal PDF
+                    const pdfModalInstance = new bootstrap.Modal(pdfModal);
+                    pdfModalInstance.show();
                 } else {
                     pdfOptions.style.display = 'none';
                     selectPosBtn.style.display = 'none';
@@ -315,6 +370,15 @@
         // === THAY ĐỔI CHÍNH BẮT ĐẦU ===
         // Lắng nghe sự kiện KHI MODAL ĐÃ HIỂN THỊ XONG
         pdfModal.addEventListener('shown.bs.modal', function() {
+            // Đồng bộ dữ liệu từ form chính sang sidebar modal
+            const mainOwnerId = document.getElementById('owner_id');
+            const mainReason = document.getElementById('reason');
+            const mainLocation = document.getElementById('location');
+
+            modalOwnerId.value = mainOwnerId.value;
+            modalReason.value = mainReason.value;
+            modalLocation.value = mainLocation.value;
+
             // Toàn bộ logic load và render PDF được chuyển vào đây
             const file = fileInput.files[0];
             if (!file) {
@@ -342,6 +406,30 @@
         // Nút "Chọn vị trí ký" bây giờ CHỈ CÓ TÁC DỤNG MỞ MODAL thông qua thuộc tính data-bs-toggle
         // Toàn bộ logic render đã được chuyển vào sự kiện 'shown.bs.modal' ở trên.
         // === THAY ĐỔI CHÍNH KẾT THÚC ===
+
+        // Xử lý nút "Ký dữ liệu" trong modal
+        modalSignBtn.addEventListener('click', function() {
+            // Kiểm tra đã chọn vị trí ký chưa
+            if (!signaturePositionInput.value || !signaturePageInput.value) {
+                alert('Vui lòng chọn vị trí ký trên PDF trước khi ký dữ liệu.');
+                return;
+            }
+
+            // Đồng bộ dữ liệu từ sidebar modal về form chính
+            const mainOwnerId = document.getElementById('owner_id');
+            const mainReason = document.getElementById('reason');
+            const mainLocation = document.getElementById('location');
+
+            mainOwnerId.value = modalOwnerId.value;
+            mainReason.value = modalReason.value;
+            mainLocation.value = modalLocation.value;
+
+            // Đóng modal và submit form
+            bootstrap.Modal.getInstance(pdfModal).hide();
+
+            // Trigger submit event trên form chính (sẽ mở passcode modal)
+            uploadForm.dispatchEvent(new Event('submit'));
+        });
 
         function clearHighlight() {
             if (signatureHighlight && signatureHighlight.parentElement) {
