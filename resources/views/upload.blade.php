@@ -324,6 +324,17 @@
         const modalSignatureType = document.getElementById('modal-signature-type');
         const signatureTypeInput = document.getElementById('signature_type');
 
+        // Add event listeners to update preview when form values change
+        modalOwnerId.addEventListener('change', updateSignaturePreview);
+        modalReason.addEventListener('input', updateSignaturePreview);
+        modalLocation.addEventListener('input', updateSignaturePreview);
+
+        function updateSignaturePreview() {
+            if (selectedPage && selectedPosition) {
+                createOrUpdateHighlight(selectedPage, selectedPosition);
+            }
+        }
+
         // Khai báo các biến trạng thái
         let pdfDoc = null;
         let selectedPage = null;
@@ -533,33 +544,24 @@
                 const width = parseFloat(element.style.width);
                 const height = parseFloat(element.style.height);
 
-                // Convert pixel center to PDF center
-                const centerX_px = x + width / 2;
-                const centerY_px = y + height / 2;
-                let pdfX = (centerX_px / canvas.width) * originalViewport.width;
-                let pdfY = originalViewport.height - (centerY_px / canvas.height) * originalViewport.height;
+                // Convert pixel position to PDF coordinates
+                // LLX, LLY (lower left)
+                const llx_px = x;
+                const lly_px = y + height; // Lower edge in screen coordinates
+                const llx = (llx_px / canvas.width) * originalViewport.width;
+                const lly = originalViewport.height - ((lly_px / canvas.height) * originalViewport.height);
 
-                // Apply boundary checks from click event
-                const signatureBoxSize = signatureBoxSizes[currentSignatureType];
-                const halfWidth = signatureBoxSize.width / 2;
-                const halfHeight = signatureBoxSize.height / 2;
-
-                if (pdfX - halfWidth < 0) pdfX = halfWidth;
-                if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width - halfWidth;
-                if (pdfY - halfHeight < 0) pdfY = halfHeight;
-                if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height - halfHeight;
-
-                // Calculate final PDF coordinates
-                const llx = Math.round(pdfX - halfWidth);
-                const lly = Math.round(pdfY - halfHeight);
-                const urx = Math.round(pdfX + halfWidth);
-                const ury = Math.round(pdfY + halfHeight);
+                // URX, URY (upper right)
+                const urx_px = x + width;
+                const ury_px = y; // Upper edge in screen coordinates
+                const urx = (urx_px / canvas.width) * originalViewport.width;
+                const ury = originalViewport.height - ((ury_px / canvas.height) * originalViewport.height);
 
                 selectedPage = pageNum;
-                selectedPosition = `${llx},${lly},${urx},${ury}`;
+                selectedPosition = `${Math.round(llx)},${Math.round(lly)},${Math.round(urx)},${Math.round(ury)}`;
 
                 // Visually snap the highlight to the corrected position
-                const finalX_px = ((llx) / originalViewport.width) * canvas.width;
+                const finalX_px = (llx / originalViewport.width) * canvas.width;
                 const finalY_px = ((originalViewport.height - ury) / originalViewport.height) * canvas.height;
                 element.style.left = `${finalX_px}px`;
                 element.style.top = `${finalY_px}px`;
@@ -570,6 +572,23 @@
             element.addEventListener('mousedown', onMouseDown);
         }
 
+
+        // Load custom font
+        let customFont = null;
+        async function loadCustomFont() {
+            try {
+                const fontFace = new FontFace('TimesNewRoman', 'url({{ asset("fonts/times-new-roman.ttf") }})');
+                const loadedFont = await fontFace.load();
+                document.fonts.add(loadedFont);
+                customFont = loadedFont;
+                console.log('Font Times New Roman loaded successfully');
+            } catch (error) {
+                console.error('Failed to load Times New Roman font:', error);
+            }
+        }
+
+        // Load font when page loads
+        loadCustomFont();
 
         function createOrUpdateHighlight(pageNum, position) {
             clearHighlight();
@@ -585,6 +604,12 @@
             signatureHighlight.style.position = 'absolute';
             signatureHighlight.style.border = '2px dashed red';
             signatureHighlight.style.cursor = 'move';
+            signatureHighlight.style.overflow = 'hidden';
+
+            // Create canvas for signature preview
+            const previewCanvas = document.createElement('canvas');
+            signatureHighlight.appendChild(previewCanvas);
+
             pageContainer.appendChild(signatureHighlight);
             makeDraggable(signatureHighlight, pageContainer);
 
@@ -607,8 +632,230 @@
             signatureHighlight.style.top = `${y}px`;
             signatureHighlight.style.width = `${width}px`;
             signatureHighlight.style.height = `${height}px`;
+
+            // Setup preview canvas
+            previewCanvas.width = width;
+            previewCanvas.height = height;
+
+            drawSignaturePreview(previewCanvas, width, height);
         }
 
+        function wrapText(ctx, text, maxWidth) {
+            if (!text) return [''];
+
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+                const testLine = currentLine ? currentLine + ' ' + word : word;
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+
+                if (testWidth > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+
+            return lines.length > 0 ? lines : [''];
+        }
+
+        function drawSignaturePreview(canvas, width, height) {
+            const ctx = canvas.getContext('2d');
+
+            // Set font properties based on C# code
+            // C# code: SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
+            const fontSize = 10;
+            ctx.font = `${fontSize}px TimesNewRoman, 'Times New Roman', serif`;
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+
+            // Get current values from form
+            const ownerName = modalOwnerId.options[modalOwnerId.selectedIndex].text;
+            const reason = modalReason.value;
+            const location = modalLocation.value;
+
+            // Format date as in C# code: dd/MM/yyyy HH:mm:ss
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+
+            // Build text content as in C# code: "Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}"
+            const textContent = [
+                { label: 'Ký bởi:', value: ownerName },
+                { label: 'Ngày ký:', value: formattedDate },
+                { label: 'Nơi ký:', value: location },
+                { label: 'Lý do:', value: reason }
+            ];
+
+            // Calculate line height (roughly 1.2x font size)
+            const lineHeight = fontSize * 1.2;
+            const paddingX = 5; // Small padding from left and right
+            const paddingY = 5; // Small padding from top and bottom
+            const maxWidth = width - (paddingX * 2);
+
+            // Wrap all text lines and calculate required height
+            // IMPORTANT: We need to wrap each line separately and collect all wrapped lines
+            const wrappedLines = [];
+            textContent.forEach(item => {
+                const fullText = `${item.label} ${item.value}`;
+                const wrapped = wrapText(ctx, fullText, maxWidth);
+                // Push each wrapped line from this item into the final array
+                wrapped.forEach(line => wrappedLines.push(line));
+            });
+
+            const requiredHeight = (wrappedLines.length * lineHeight) + (paddingY * 2);
+
+            // Clear canvas first
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // If required height is greater than current height, resize canvas and parent div
+            if (requiredHeight > height) {
+                const oldHeight = height;
+                const newHeight = requiredHeight;
+
+                canvas.height = newHeight;
+                canvas.parentElement.style.height = `${newHeight}px`;
+
+                // Check if resize causes overflow and adjust position
+                adjustPositionAfterResize(canvas.parentElement, newHeight);
+
+                // Update signature position to reflect new height
+                if (selectedPosition) {
+                    updateSignaturePositionAfterResize(width, oldHeight, newHeight);
+                }
+ 
+                // Re-set font after canvas resize (canvas loses context when resized)
+                ctx.font = `${fontSize}px TimesNewRoman, 'Times New Roman', serif`;
+                ctx.fillStyle = 'red';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+            }
+
+            // Draw each wrapped line
+            wrappedLines.forEach((line, index) => {
+                const y = paddingY + (index * lineHeight);
+                ctx.fillText(line, paddingX, y);
+            });
+        }
+
+        function adjustPositionAfterResize(element, newHeight) {
+            if (!selectedPage || !element) return;
+
+            const pageContainer = document.getElementById(`pdf-page-container-${selectedPage}`);
+            if (!pageContainer) return;
+
+            let currentTop = parseFloat(element.style.top);
+            let currentLeft = parseFloat(element.style.left);
+            const currentWidth = parseFloat(element.style.width);
+
+            // Get container dimensions (same as in makeDraggable)
+            const containerHeight = pageContainer.clientHeight;
+            const containerWidth = pageContainer.clientWidth;
+
+            let positionChanged = false;
+
+            // Apply boundary checks (same logic as onMouseMove in makeDraggable)
+            // Check left boundary
+            if (currentLeft < 0) {
+                currentLeft = 0;
+                positionChanged = true;
+            }
+
+            // Check top boundary
+            if (currentTop < 0) {
+                currentTop = 0;
+                positionChanged = true;
+            }
+
+            // Check right boundary
+            if (currentLeft + currentWidth > containerWidth) {
+                currentLeft = containerWidth - currentWidth;
+                positionChanged = true;
+            }
+
+            // Check bottom boundary (important after height resize!)
+            if (currentTop + newHeight > containerHeight) {
+                currentTop = containerHeight - newHeight;
+                positionChanged = true;
+            }
+
+            // Ensure position doesn't go negative after adjustment
+            if (currentLeft < 0) currentLeft = 0;
+            if (currentTop < 0) currentTop = 0;
+
+            // Update position if needed
+            if (positionChanged) {
+                element.style.top = `${currentTop}px`;
+                element.style.left = `${currentLeft}px`;
+
+                // Recalculate PDF coordinates with new position (same as onMouseUp)
+                const pageInfo = pageData[selectedPage];
+                if (pageInfo) {
+                    const canvas = pageInfo.canvas;
+                    const originalViewport = pageInfo.viewport;
+
+                    // Calculate PDF coordinates from pixel position
+                    const llx_px = currentLeft;
+                    const lly_px = currentTop + newHeight; // Lower edge
+                    const llx = (llx_px / canvas.width) * originalViewport.width;
+                    const lly = originalViewport.height - ((lly_px / canvas.height) * originalViewport.height);
+
+                    const urx_px = currentLeft + currentWidth;
+                    const ury_px = currentTop; // Upper edge
+                    const urx = (urx_px / canvas.width) * originalViewport.width;
+                    const ury = originalViewport.height - ((ury_px / canvas.height) * originalViewport.height);
+
+                    selectedPosition = `${Math.round(llx)},${Math.round(lly)},${Math.round(urx)},${Math.round(ury)}`;
+                    signaturePositionInput.value = selectedPosition;
+                }
+            }
+        }
+
+        function updateSignaturePositionAfterResize(canvasWidth, oldHeight, newHeight) {
+            if (!selectedPosition || !selectedPage) return;
+
+            const pageInfo = pageData[selectedPage];
+            if (!pageInfo) return;
+
+            const pos = selectedPosition.split(',');
+            const llx = parseFloat(pos[0]);
+            const lly = parseFloat(pos[1]);
+            const urx = parseFloat(pos[2]);
+            const ury = parseFloat(pos[3]);
+
+            const originalViewport = pageInfo.viewport;
+            const canvas = pageInfo.canvas;
+
+            // Calculate the height difference in screen pixels
+            const heightDiffPx = newHeight - oldHeight;
+
+            // Convert height difference to PDF coordinates
+            const heightDiffPDF = (heightDiffPx / canvas.height) * originalViewport.height;
+
+            // Update URY (upper right Y) by adding the height difference
+            const newUry = ury + heightDiffPDF;
+
+            // Update the selected position
+            selectedPosition = `${Math.round(llx)},${Math.round(lly)},${Math.round(urx)},${Math.round(newUry)}`;
+
+            // Update the input field and save
+            signaturePositionInput.value = selectedPosition;
+        }
 
         function renderAllPages() {
             pdfViewer.innerHTML = '';

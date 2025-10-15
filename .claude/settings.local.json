@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:\\laragon\\www\\signserver\\public\\fonts\")",
+      "Bash(copy \"C:\\laragon\\www\\signserver\\Release_Restful\\rssp_sdk\\bin\\Debug\\font-times-new-roman.ttf\" \"C:\\laragon\\www\\signserver\\public\\fonts\\times-new-roman.ttf\")",
+      "Bash(cp \"C:\\laragon\\www\\signserver\\Release_Restful\\rssp_sdk\\bin\\Debug\\font-times-new-roman.ttf\" \"C:\\laragon\\www\\signserver\\public\\fonts\\times-new-roman.ttf\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
