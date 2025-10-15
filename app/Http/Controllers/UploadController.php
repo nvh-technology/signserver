@@ -78,7 +78,8 @@ class UploadController extends Controller
             $request->input('signature_position'),
             $request->input('reason'),
             $request->input('location'),
-            $user->backgroundSignature
+            $user->backgroundSignature,
+            $request->input('signature_type', 'main') // Mặc định là ký chính
         );
 
         // 3. Handle the result

@@ -97,6 +97,13 @@
                             </div>
                             <div id="pdf-options">
                                 <div class="mb-3">
+                                    <label for="signature_type" class="form-label">Loại chữ ký</label>
+                                    <select class="form-select" id="signature_type" name="signature_type">
+                                        <option value="main" selected>Ký chính (170x70)</option>
+                                        <option value="draft">Ký nháy (113x46)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
                                     <label for="reason" class="form-label">Lý do ký</label>
                                     <input type="text" class="form-control" id="reason" name="reason"
                                         value="Ký số điện tử">
@@ -212,6 +219,14 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="modal-signature-type" class="form-label">Loại chữ ký</label>
+                                <select class="form-select" id="modal-signature-type" name="signature_type">
+                                    <option value="main" selected>Ký chính (170x70)</option>
+                                    <option value="draft">Ký nháy (113x46)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="modal-reason" class="form-label">Lý do ký</label>
                                 <input type="text" class="form-control" id="modal-reason" name="reason"
                                     value="Ký số điện tử">
@@ -306,17 +321,37 @@
         const modalOwnerId = document.getElementById('modal-owner-id');
         const modalReason = document.getElementById('modal-reason');
         const modalLocation = document.getElementById('modal-location');
+        const modalSignatureType = document.getElementById('modal-signature-type');
+        const signatureTypeInput = document.getElementById('signature_type');
 
         // Khai báo các biến trạng thái
         let pdfDoc = null;
         let selectedPage = null;
         let selectedPosition = null;
-        const signatureBoxSize = {
-            width: 170,
-            height: 70
+        const signatureBoxSizes = {
+            main: {
+                width: 170,
+                height: 70
+            },
+            draft: {
+                width: 113,
+                height: 46
+            }
         };
+        let currentSignatureType = 'main'; // Mặc định là ký chính
         let signatureHighlight = null;
         const pageData = {}; // { pageNum: { viewport: originalViewport, canvas: canvasElement } }
+
+        // Lắng nghe thay đổi loại chữ ký
+        modalSignatureType.addEventListener('change', function() {
+            currentSignatureType = this.value;
+            // Nếu đã chọn vị trí, cập nhật lại highlight với kích thước mới
+            if (selectedPage && selectedPosition) {
+                // Xóa position cũ và yêu cầu chọn lại
+                clearSavedPosition();
+                alert('Vui lòng chọn lại vị trí ký với kích thước chữ ký mới.');
+            }
+        });
 
         function savePosition() {
             signBtn.style.display = 'none';
@@ -374,10 +409,13 @@
             const mainOwnerId = document.getElementById('owner_id');
             const mainReason = document.getElementById('reason');
             const mainLocation = document.getElementById('location');
+            const mainSignatureType = document.getElementById('signature_type');
 
             modalOwnerId.value = mainOwnerId.value;
             modalReason.value = mainReason.value;
             modalLocation.value = mainLocation.value;
+            modalSignatureType.value = mainSignatureType.value;
+            currentSignatureType = mainSignatureType.value; // Cập nhật loại chữ ký hiện tại
 
             // Toàn bộ logic load và render PDF được chuyển vào đây
             const file = fileInput.files[0];
@@ -419,10 +457,12 @@
             const mainOwnerId = document.getElementById('owner_id');
             const mainReason = document.getElementById('reason');
             const mainLocation = document.getElementById('location');
+            const mainSignatureType = document.getElementById('signature_type');
 
             mainOwnerId.value = modalOwnerId.value;
             mainReason.value = modalReason.value;
             mainLocation.value = modalLocation.value;
+            mainSignatureType.value = modalSignatureType.value;
 
             // Đóng modal và submit form
             bootstrap.Modal.getInstance(pdfModal).hide();
@@ -500,6 +540,7 @@
                 let pdfY = originalViewport.height - (centerY_px / canvas.height) * originalViewport.height;
 
                 // Apply boundary checks from click event
+                const signatureBoxSize = signatureBoxSizes[currentSignatureType];
                 const halfWidth = signatureBoxSize.width / 2;
                 const halfHeight = signatureBoxSize.height / 2;
 
@@ -629,6 +670,7 @@
                         let pdfX = (x / rect.width) * originalViewport.width;
                         let pdfY = originalViewport.height - ((y / rect.height) * originalViewport.height);
 
+                        const signatureBoxSize = signatureBoxSizes[currentSignatureType];
                         const halfWidth = signatureBoxSize.width / 2;
                         const halfHeight = signatureBoxSize.height / 2;
 
