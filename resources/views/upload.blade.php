@@ -673,8 +673,8 @@
 
             // Set font properties based on C# code
             // C# code: SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
-            const fontSize = 10;
-            ctx.font = `${fontSize}px TimesNewRoman, 'Times New Roman', serif`;
+            const fontSize = 16;
+            ctx.font = `${fontSize}px 'Times New Roman'`;
             ctx.fillStyle = 'red';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
@@ -703,7 +703,7 @@
             ];
 
             // Calculate line height (roughly 1.2x font size)
-            const lineHeight = fontSize * 1.2;
+            const lineHeight = fontSize * 1;
             const paddingX = 5; // Small padding from left and right
             const paddingY = 5; // Small padding from top and bottom
             const maxWidth = width - (paddingX * 2);
