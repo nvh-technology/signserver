@@ -696,7 +696,7 @@
 
             // Build text content as in C# code: "Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}"
             const textContent = [
-                { label: 'Ký bởi:', value: ownerName },
+                { label: 'Ký bởi:', value: "{{ request()->user()->name ?? '' }}" },
                 { label: 'Ngày ký:', value: formattedDate },
                 { label: 'Nơi ký:', value: location },
                 { label: 'Lý do:', value: reason }
