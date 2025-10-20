@@ -46,7 +46,7 @@
                                 <td>{{ $user->email }}</td>
                                 <td>
                                     @if ($user->backgroundSignature)
-                                        <img src="{{ route('admin.users.backgroundSignature', $user) }}?{{ rand() }}" alt="Chữ ký nền"
+                                        <img src="{{ route('users.backgroundSignature', $user) }}?{{ rand() }}" alt="Chữ ký nền"
                                             height="50">
                                     @endif
                                 </td>

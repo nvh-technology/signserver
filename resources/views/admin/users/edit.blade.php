@@ -62,7 +62,7 @@
                     @if ($user->backgroundSignature)
                         <div class="mt-2">
                             <p>Chữ ký nền hiện tại:</p>
-                            <img src="{{ route('admin.users.backgroundSignature', $user) }}?{{ rand() }}" alt="Background Signature"
+                            <img src="{{ route('users.backgroundSignature', $user) }}?{{ rand() }}" alt="Background Signature"
                                 width="150">
                         </div>
                     @endif

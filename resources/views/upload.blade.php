@@ -675,7 +675,7 @@
         function drawSignaturePreview(canvas, width, height, pageNum) {
             const ctx = canvas.getContext('2d');
             const backgroundSignatureUrl =
-                "{{ auth()->user() && auth()->user()->backgroundSignature ? (route('admin.users.backgroundSignature', auth()->user()) . '?' . rand()) : '' }}";
+                "{{ auth()->user() && auth()->user()->backgroundSignature ? (route('users.backgroundSignature', auth()->user()) . '?' . rand()) : '' }}";
 
             const doDrawing = (bgImage) => {
                 const pageInfo = pageData[pageNum];

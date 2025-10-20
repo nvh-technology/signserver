@@ -230,6 +230,9 @@ class UserController extends Controller
 
     public function backgroundSignature(User $user)
     {
+        if($user->id != \Auth::id() && !\Auth::user()->hasRole('admin')){
+            abort(404);
+        }
         if ($user->backgroundSignature && Storage::disk('local')->exists($user->backgroundSignature)) {
             return response()->file(Storage::disk('local')->path($user->backgroundSignature));
         }
