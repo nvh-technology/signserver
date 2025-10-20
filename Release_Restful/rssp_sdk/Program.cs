@@ -47,6 +47,7 @@ namespace RSSPAPI
         public static string signaturePage;
         public static string signaturePosition;
         public static string relyingPartyKeyStore;
+        public static int fontSize = 10;
 
         static void Main(string[] args)
         {
@@ -103,6 +104,9 @@ namespace RSSPAPI
                     case "--position":
                         signaturePosition = args[++i];
                         break;
+                    case "--fontSize":
+                        fontSize = int.Parse(args[++i]);
+                        break;
                 }
             }
 
@@ -126,6 +130,7 @@ namespace RSSPAPI
                 Console.Error.WriteLine("  --offset: X,Y coordinates for visible signature (default: \"-30,-100\").");
                 Console.Error.WriteLine("  --boxSize: Width,Height for visible signature box (default: \"170,70\").");
                 Console.Error.WriteLine("  --titleText: Title text for visible signature (default: \"DIGITAL SIGNATURE\").");
+                Console.Error.WriteLine("  --fontSize: Font size for signature text (default: 10).");
                 Console.Error.WriteLine("=======================================");
                 Console.Error.WriteLine("  --page: Page number for the visible signature.");
                 Console.Error.WriteLine("  --position: Coordinates for the visible signature (format: llx,lly,urx,ury).");
@@ -200,7 +205,7 @@ namespace RSSPAPI
                     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                     Encoding.GetEncoding(1252);
                     byte[] Font = File.ReadAllBytes("font-times-new-roman.ttf");
-                    profile.SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
+                    profile.SetFont(Font, BaseFont.CP1252, true, fontSize, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
 
                     SigningMethodAsyncImp signInit = new SigningMethodAsyncImp();
                     byte[] temporalData = profile.CreateTemporalFile(signInit, src);
