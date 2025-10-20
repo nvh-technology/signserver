@@ -673,16 +673,18 @@
 
             // Set font properties based on C# code
             // C# code: SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
-            const fontSize = 16;
+            // fontSize: 18 for 'main' signature type, 14 for 'draft' signature type
+            const fontSize = currentSignatureType === 'main' ? 18 : 14;
             ctx.font = `${fontSize}px 'Times New Roman'`;
             ctx.fillStyle = 'red';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
 
-            // Get current values from form
-            const ownerName = modalOwnerId.options[modalOwnerId.selectedIndex].text;
-            const reason = modalReason.value;
-            const location = modalLocation.value;
+            // Get current values from form with safety checks
+            const selectedOption = modalOwnerId.options[modalOwnerId.selectedIndex];
+            const ownerName = selectedOption ? selectedOption.text : '';
+            const reason = modalReason.value || '';
+            const location = modalLocation.value || '';
 
             // Format date as in C# code: dd/MM/yyyy HH:mm:ss
             const now = new Date();
@@ -738,9 +740,9 @@
                 if (selectedPosition) {
                     updateSignaturePositionAfterResize(width, oldHeight, newHeight);
                 }
- 
+
                 // Re-set font after canvas resize (canvas loses context when resized)
-                ctx.font = `${fontSize}px TimesNewRoman, 'Times New Roman', serif`;
+                ctx.font = `${fontSize}px TimesNewRoman`;
                 ctx.fillStyle = 'red';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
