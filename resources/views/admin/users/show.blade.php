@@ -53,7 +53,7 @@
                                 Chữ ký nền
                             </div>
                             <div class="card-body">
-                                <img src="{{ route('admin.users.backgroundSignature', $user) }}" alt="Chữ ký nền"
+                                <img src="{{ route('admin.users.backgroundSignature', $user) }}?{{ rand() }}" alt="Chữ ký nền"
                                     class="img-fluid">
                             </div>
                         </div>

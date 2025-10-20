@@ -99,8 +99,8 @@
                                 <div class="mb-3">
                                     <label for="signature_type" class="form-label">Loại chữ ký</label>
                                     <select class="form-select" id="signature_type" name="signature_type">
-                                        <option value="main" selected>Ký chính (170x70)</option>
-                                        <option value="draft">Ký nháy (113x46)</option>
+                                        <option value="main" selected>Ký chính</option>
+                                        <option value="draft">Ký nháy</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -221,8 +221,8 @@
                             <div class="mb-3">
                                 <label for="modal-signature-type" class="form-label">Loại chữ ký</label>
                                 <select class="form-select" id="modal-signature-type" name="signature_type">
-                                    <option value="main" selected>Ký chính (170x70)</option>
-                                    <option value="draft">Ký nháy (113x46)</option>
+                                    <option value="main" selected>Ký chính</option>
+                                    <option value="draft">Ký nháy</option>
                                 </select>
                             </div>
 
@@ -345,8 +345,8 @@
                 height: 70
             },
             draft: {
-                width: 113,
-                height: 46
+                width: 85,
+                height: 35
             }
         };
         let currentSignatureType = 'main'; // Mặc định là ký chính
@@ -576,7 +576,7 @@
         let customFont = null;
         async function loadCustomFont() {
             try {
-                const fontFace = new FontFace('TimesNewRoman', 'url({{ asset("fonts/times-new-roman.ttf") }})');
+                const fontFace = new FontFace('TimesNewRoman', 'url({{ asset('fonts/times-new-roman.ttf') }})');
                 const loadedFont = await fontFace.load();
                 document.fonts.add(loadedFont);
                 customFont = loadedFont;
@@ -641,7 +641,7 @@
             previewCanvas.width = width;
             previewCanvas.height = height;
 
-            drawSignaturePreview(previewCanvas, width, height);
+            drawSignaturePreview(previewCanvas, width, height, pageNum);
         }
 
         function wrapText(ctx, text, maxWidth) {
@@ -672,91 +672,118 @@
             return lines.length > 0 ? lines : [''];
         }
 
-        function drawSignaturePreview(canvas, width, height) {
+        function drawSignaturePreview(canvas, width, height, pageNum) {
             const ctx = canvas.getContext('2d');
+            const backgroundSignatureUrl =
+                "{{ auth()->user() && auth()->user()->backgroundSignature ? (route('admin.users.backgroundSignature', auth()->user()) . '?' . rand()) : '' }}";
 
-            // Set font properties based on C# code
-            // C# code: SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
-            // fontSize: 18 for 'main' signature type, 14 for 'draft' signature type
-            const fontSize = currentSignatureType === 'main' ? (canvas.width*0.1) : 14;
-            ctx.font = `${fontSize}px 'Times New Roman'`;
-            ctx.fillStyle = 'red';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-
-            // Get current values from form with safety checks
-            const selectedOption = modalOwnerId.options[modalOwnerId.selectedIndex];
-            const ownerName = selectedOption ? selectedOption.text : '';
-            const reason = modalReason.value || '';
-            const location = modalLocation.value || '';
-
-            // Format date as in C# code: dd/MM/yyyy HH:mm:ss
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-
-            // Build text content as in C# code: "Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}"
-            const textContent = [
-                { label: 'Ký bởi:', value: "{{ request()->user()->name ?? '' }}" },
-                { label: 'Ngày ký:', value: formattedDate },
-                { label: 'Nơi ký:', value: location },
-                { label: 'Lý do:', value: reason }
-            ];
-
-            // Calculate line height (roughly 1.2x font size)
-            const lineHeight = fontSize * 1;
-            const paddingX = 5; // Small padding from left and right
-            const paddingY = 5; // Small padding from top and bottom
-            const maxWidth = width - (paddingX * 2);
-
-            // Wrap all text lines and calculate required height
-            // IMPORTANT: We need to wrap each line separately and collect all wrapped lines
-            const wrappedLines = [];
-            textContent.forEach(item => {
-                const fullText = `${item.label} ${item.value}`;
-                const wrapped = wrapText(ctx, fullText, maxWidth);
-                // Push each wrapped line from this item into the final array
-                wrapped.forEach(line => wrappedLines.push(line));
-            });
-
-            const requiredHeight = (wrappedLines.length * lineHeight) + (paddingY * 2);
-
-            // Clear canvas first
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // If required height is greater than current height, resize canvas and parent div
-            if (requiredHeight > height) {
-                const oldHeight = height;
-                const newHeight = requiredHeight;
-
-                canvas.height = newHeight;
-                canvas.parentElement.style.height = `${newHeight}px`;
-
-                // Check if resize causes overflow and adjust position
-                adjustPositionAfterResize(canvas.parentElement, newHeight);
-
-                // Update signature position to reflect new height
-                if (selectedPosition) {
-                    updateSignaturePositionAfterResize(width, oldHeight, newHeight);
+            const doDrawing = (bgImage) => {
+                const pageInfo = pageData[pageNum];
+                if (!pageInfo) {
+                    console.error("Page info not found for page: ", pageNum);
+                    return;
                 }
+                const pageCanvas = pageInfo.canvas;
+                const originalViewport = pageInfo.viewport;
 
-                // Re-set font after canvas resize (canvas loses context when resized)
-                ctx.font = `${fontSize}px TimesNewRoman`;
+                const scaleX = pageCanvas.width / originalViewport.width;
+                const scaleY = pageCanvas.height / originalViewport.height;
+console.log(scaleX, scaleY);
+
+                // Set font properties
+                const fontSize = scaleX*10;
+                ctx.font = `${fontSize}px 'Times New Roman'`;
                 ctx.fillStyle = 'red';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
-            }
 
-            // Draw each wrapped line
-            wrappedLines.forEach((line, index) => {
-                const y = paddingY + (index * lineHeight);
-                ctx.fillText(line, paddingX, y);
-            });
+                // Get form values
+                const reason = modalReason.value || '';
+                const location = modalLocation.value || '';
+                const now = new Date();
+                const formattedDate =
+                    `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+                const textContent = [{
+                    label: 'Ký bởi:',
+                    value: "{{ request()->user()->name ?? '' }}"
+                }, {
+                    label: 'Ngày ký:',
+                    value: formattedDate
+                }, {
+                    label: 'Nơi ký:',
+                    value: location
+                }, {
+                    label: 'Lý do:',
+                    value: reason
+                }];
+
+                const lineHeight = fontSize * 1;
+                const paddingX = 5;
+                const paddingY = 5;
+                const maxWidth = width - (paddingX * 2);
+
+                const wrappedLines = [];
+
+                // Only wrap lines if we are not in draft mode
+                if (currentSignatureType !== 'draft') {
+                    textContent.forEach(item => {
+                        const fullText = `${item.label} ${item.value}`;
+                        wrapText(ctx, fullText, maxWidth).forEach(line => wrappedLines.push(
+                            line));
+                    });
+                }
+
+                const requiredHeight = (wrappedLines.length * lineHeight) + (paddingY * 2);
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let finalHeight = height;
+
+                // Resize logic only for non-draft
+                if (currentSignatureType !== 'draft' && requiredHeight > height) {
+                    const oldHeight = height;
+                    finalHeight = requiredHeight;
+
+                    canvas.height = finalHeight;
+                    canvas.parentElement.style.height = `${finalHeight}px`;
+
+                    adjustPositionAfterResize(canvas.parentElement, finalHeight);
+
+                    if (selectedPosition) {
+                        updateSignaturePositionAfterResize(width, oldHeight, finalHeight);
+                    }
+
+                    // Reset font after resize
+                    ctx.font = `${fontSize}px TimesNewRoman`;
+                    ctx.fillStyle = 'red';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                }
+
+                // Draw background if it exists
+                if (bgImage) {
+                    ctx.drawImage(bgImage, 0, 0, canvas.width, finalHeight);
+                }
+
+                // Draw text if not draft
+                if (currentSignatureType !== 'draft') {
+                    wrappedLines.forEach((line, index) => {
+                        const y = paddingY + (index * lineHeight);
+                        ctx.fillText(line, paddingX, y);
+                    });
+                }
+            };
+
+            if (backgroundSignatureUrl) {
+                const img = new Image();
+                img.onload = () => doDrawing(img);
+                img.onerror = () => doDrawing(null);
+                img.src = backgroundSignatureUrl + '?t=' + new Date().getTime();
+            } else {
+                doDrawing(null);
+            }
         }
 
         function adjustPositionAfterResize(element, newHeight) {
@@ -937,9 +964,11 @@
 
                         // Apply boundary checks in PDF coordinate space
                         if (pdfX - halfWidth < 0) pdfX = halfWidth;
-                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width - halfWidth;
+                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width -
+                            halfWidth;
                         if (pdfY - halfHeight < 0) pdfY = halfHeight;
-                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height - halfHeight;
+                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height -
+                            halfHeight;
 
                         const llx = Math.round(pdfX - halfWidth);
                         const lly = Math.round(pdfY - halfHeight);
