@@ -73,8 +73,7 @@ class RSSPHelper
             }
             // Thêm kích thước chữ ký dựa trên loại chữ ký
             if ($signatureType === 'draft') {
-                $cmd .= ' --boxSize "113,46"';
-                $cmd .= ' --fontSize "8"';
+                $cmd .= ' --signatureType draft';
             } else {
                 // Mặc định là ký chính (170,70)
                 $cmd .= ' --boxSize "170,70"';

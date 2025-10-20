@@ -47,7 +47,7 @@ namespace RSSPAPI
         public static string signaturePage;
         public static string signaturePosition;
         public static string relyingPartyKeyStore;
-        public static int fontSize = 10;
+        public static string signatureType = "main"; // Default to "main", can be "draft"
 
         static void Main(string[] args)
         {
@@ -104,8 +104,8 @@ namespace RSSPAPI
                     case "--position":
                         signaturePosition = args[++i];
                         break;
-                    case "--fontSize":
-                        fontSize = int.Parse(args[++i]);
+                    case "--signatureType":
+                        signatureType = args[++i];
                         break;
                 }
             }
@@ -113,7 +113,7 @@ namespace RSSPAPI
             // Argument validation and usage instructions
             if (string.IsNullOrEmpty(PATH_TO_FILE_CONFIG) || string.IsNullOrEmpty(relyingPartyKeyStore) || string.IsNullOrEmpty(passCode) || (string.IsNullOrEmpty(filePDF) && string.IsNullOrEmpty(fileOffice)) || (string.IsNullOrEmpty(userID) && string.IsNullOrEmpty(credentialID)))
             {
-                Console.Error.WriteLine("Usage: Program.exe --fileConfig <path> --keystoreFile <path> (--userID <id> | --credentialID <id>) --passCode <pass> (--filePDF <path> | --fileOffice <path>) [--signedsPath <path>] [--reason <text>] [--location <text>] [--backgroundPath <path>] [--offset <x,y>] [--boxSize <width,height>] [--titleText <text>] [--page <page>] [--position <llx,lly,urx,ury>]");
+                Console.Error.WriteLine("Usage: Program.exe --fileConfig <path> --keystoreFile <path> (--userID <id> | --credentialID <id>) --passCode <pass> (--filePDF <path> | --fileOffice <path>) [--signedsPath <path>] [--reason <text>] [--location <text>] [--backgroundPath <path>] [--offset <x,y>] [--boxSize <width,height>] [--titleText <text>] [--page <page>] [--position <llx,lly,urx,ury>] [--signatureType <main|draft>]");
                 Console.Error.WriteLine("  --fileConfig: Path to the configuration file.");
                 Console.Error.WriteLine("  --userID: User ID for listing certificates (required if --credentialID is not used).");
                 Console.Error.WriteLine("  --credentialID: Specific credential ID to use (skips certificate listing).");
@@ -130,10 +130,10 @@ namespace RSSPAPI
                 Console.Error.WriteLine("  --offset: X,Y coordinates for visible signature (default: \"-30,-100\").");
                 Console.Error.WriteLine("  --boxSize: Width,Height for visible signature box (default: \"170,70\").");
                 Console.Error.WriteLine("  --titleText: Title text for visible signature (default: \"DIGITAL SIGNATURE\").");
-                Console.Error.WriteLine("  --fontSize: Font size for signature text (default: 10).");
                 Console.Error.WriteLine("=======================================");
                 Console.Error.WriteLine("  --page: Page number for the visible signature.");
                 Console.Error.WriteLine("  --position: Coordinates for the visible signature (format: llx,lly,urx,ury).");
+                Console.Error.WriteLine("  --signatureType: Type of signature: 'main' (with text) or 'draft' (background only, default: 'main').");
                 return;
             }
 
@@ -182,7 +182,17 @@ namespace RSSPAPI
                     // Step 4: credentials/authorize
                     PdfProfileCMS profile = new PdfProfileCMS(PdfForm.B, Algorithm.SHA256);
                     profile.SetReason(reason);
-                    profile.SetTextContent("Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}");
+
+                    // If signatureType is "draft", only show background (no text)
+                    if (signatureType == "draft")
+                    {
+                        profile.SetTextContent(""); // Empty text for draft signature
+                    }
+                    else
+                    {
+                        profile.SetTextContent("Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}");
+                    }
+
                     if (!string.IsNullOrEmpty(signaturePage) && !string.IsNullOrEmpty(signaturePosition))
                     {
                         profile.SetVisibleSignature(signaturePage, signaturePosition);
@@ -204,8 +214,13 @@ namespace RSSPAPI
 
                     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                     Encoding.GetEncoding(1252);
-                    byte[] Font = File.ReadAllBytes("font-times-new-roman.ttf");
-                    profile.SetFont(Font, BaseFont.CP1252, true, fontSize, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
+
+                    // Only set font if signatureType is NOT "draft"
+                    if (signatureType != "draft")
+                    {
+                        byte[] Font = File.ReadAllBytes("font-times-new-roman.ttf");
+                        profile.SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
+                    }
 
                     SigningMethodAsyncImp signInit = new SigningMethodAsyncImp();
                     byte[] temporalData = profile.CreateTemporalFile(signInit, src);

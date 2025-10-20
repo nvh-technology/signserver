@@ -513,13 +513,18 @@
                 let newX = e.clientX - containerRect.left - offsetX;
                 let newY = e.clientY - containerRect.top - offsetY;
 
+                // Get canvas dimensions for consistent boundary checks
+                const canvas = container.querySelector('canvas');
+                const maxWidth = canvas.width;
+                const maxHeight = canvas.height;
+
                 if (newX < 0) newX = 0;
                 if (newY < 0) newY = 0;
-                if (newX + element.offsetWidth > container.clientWidth) {
-                    newX = container.clientWidth - element.offsetWidth;
+                if (newX + element.offsetWidth > maxWidth) {
+                    newX = maxWidth - element.offsetWidth;
                 }
-                if (newY + element.offsetHeight > container.clientHeight) {
-                    newY = container.clientHeight - element.offsetHeight;
+                if (newY + element.offsetHeight > maxHeight) {
+                    newY = maxHeight - element.offsetHeight;
                 }
 
                 element.style.left = `${newX}px`;
@@ -544,27 +549,21 @@
                 const width = parseFloat(element.style.width);
                 const height = parseFloat(element.style.height);
 
-                // Convert pixel position to PDF coordinates
+                // Calculate scale factor between canvas (scaled) and original viewport
+                const scaleX = canvas.width / originalViewport.width;
+                const scaleY = canvas.height / originalViewport.height;
+
+                // Convert pixel position to PDF coordinates (using original viewport dimensions)
                 // LLX, LLY (lower left)
-                const llx_px = x;
-                const lly_px = y + height; // Lower edge in screen coordinates
-                const llx = (llx_px / canvas.width) * originalViewport.width;
-                const lly = originalViewport.height - ((lly_px / canvas.height) * originalViewport.height);
+                const llx = x / scaleX;
+                const lly = originalViewport.height - ((y + height) / scaleY);
 
                 // URX, URY (upper right)
-                const urx_px = x + width;
-                const ury_px = y; // Upper edge in screen coordinates
-                const urx = (urx_px / canvas.width) * originalViewport.width;
-                const ury = originalViewport.height - ((ury_px / canvas.height) * originalViewport.height);
+                const urx = (x + width) / scaleX;
+                const ury = originalViewport.height - (y / scaleY);
 
                 selectedPage = pageNum;
                 selectedPosition = `${Math.round(llx)},${Math.round(lly)},${Math.round(urx)},${Math.round(ury)}`;
-
-                // Visually snap the highlight to the corrected position
-                const finalX_px = (llx / originalViewport.width) * canvas.width;
-                const finalY_px = ((originalViewport.height - ury) / originalViewport.height) * canvas.height;
-                element.style.left = `${finalX_px}px`;
-                element.style.top = `${finalY_px}px`;
 
                 savePosition();
             };
@@ -623,10 +622,15 @@
             const originalViewport = pageInfo.viewport;
             const canvas = pageInfo.canvas;
 
-            const x = llx_render * canvas.width / originalViewport.width;
-            const y = (originalViewport.height - ury_render) * canvas.height / originalViewport.height;
-            const width = (urx_render - llx_render) * canvas.width / originalViewport.width;
-            const height = (ury_render - lly_render) * canvas.height / originalViewport.height;
+            // Calculate scale factor between canvas (scaled) and original viewport
+            const scaleX = canvas.width / originalViewport.width;
+            const scaleY = canvas.height / originalViewport.height;
+
+            // Convert PDF coordinates to pixel position
+            const x = llx_render * scaleX;
+            const y = (originalViewport.height - ury_render) * scaleY;
+            const width = (urx_render - llx_render) * scaleX;
+            const height = (ury_render - lly_render) * scaleY;
 
             signatureHighlight.style.left = `${x}px`;
             signatureHighlight.style.top = `${y}px`;
@@ -674,7 +678,7 @@
             // Set font properties based on C# code
             // C# code: SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
             // fontSize: 18 for 'main' signature type, 14 for 'draft' signature type
-            const fontSize = currentSignatureType === 'main' ? 18 : 14;
+            const fontSize = currentSignatureType === 'main' ? (canvas.width*0.1) : 14;
             ctx.font = `${fontSize}px 'Times New Roman'`;
             ctx.fillStyle = 'red';
             ctx.textAlign = 'left';
@@ -765,9 +769,10 @@
             let currentLeft = parseFloat(element.style.left);
             const currentWidth = parseFloat(element.style.width);
 
-            // Get container dimensions (same as in makeDraggable)
-            const containerHeight = pageContainer.clientHeight;
-            const containerWidth = pageContainer.clientWidth;
+            // Get canvas dimensions (same as in makeDraggable onMouseMove)
+            const canvas = pageContainer.querySelector('canvas');
+            const containerHeight = canvas.height;
+            const containerWidth = canvas.width;
 
             let positionChanged = false;
 
@@ -811,16 +816,15 @@
                     const canvas = pageInfo.canvas;
                     const originalViewport = pageInfo.viewport;
 
-                    // Calculate PDF coordinates from pixel position
-                    const llx_px = currentLeft;
-                    const lly_px = currentTop + newHeight; // Lower edge
-                    const llx = (llx_px / canvas.width) * originalViewport.width;
-                    const lly = originalViewport.height - ((lly_px / canvas.height) * originalViewport.height);
+                    // Calculate scale factor
+                    const scaleX = canvas.width / originalViewport.width;
+                    const scaleY = canvas.height / originalViewport.height;
 
-                    const urx_px = currentLeft + currentWidth;
-                    const ury_px = currentTop; // Upper edge
-                    const urx = (urx_px / canvas.width) * originalViewport.width;
-                    const ury = originalViewport.height - ((ury_px / canvas.height) * originalViewport.height);
+                    // Calculate PDF coordinates from pixel position
+                    const llx = currentLeft / scaleX;
+                    const lly = originalViewport.height - ((currentTop + newHeight) / scaleY);
+                    const urx = (currentLeft + currentWidth) / scaleX;
+                    const ury = originalViewport.height - (currentTop / scaleY);
 
                     selectedPosition = `${Math.round(llx)},${Math.round(lly)},${Math.round(urx)},${Math.round(ury)}`;
                     signaturePositionInput.value = selectedPosition;
@@ -843,19 +847,22 @@
             const originalViewport = pageInfo.viewport;
             const canvas = pageInfo.canvas;
 
+            // Calculate scale factor
+            const scaleY = canvas.height / originalViewport.height;
+
             // Calculate the height difference in screen pixels
             const heightDiffPx = newHeight - oldHeight;
 
             // Convert height difference to PDF coordinates
-            const heightDiffPDF = (heightDiffPx / canvas.height) * originalViewport.height;
+            const heightDiffPDF = heightDiffPx / scaleY;
 
-            // Update URY (upper right Y) by adding the height difference
-            const newUry = ury + heightDiffPDF;
+            // Update LLY (lower left Y) by subtracting the height difference
+            const newLly = lly - heightDiffPDF;
 
             // Update the selected position
-            selectedPosition = `${Math.round(llx)},${Math.round(lly)},${Math.round(urx)},${Math.round(newUry)}`;
+            selectedPosition = `${Math.round(llx)},${Math.round(newLly)},${Math.round(urx)},${Math.round(ury)}`;
 
-            // Update the input field and save
+            // Update the input field
             signaturePositionInput.value = selectedPosition;
         }
 
@@ -916,19 +923,23 @@
                             scale: 1
                         });
 
-                        let pdfX = (x / rect.width) * originalViewport.width;
-                        let pdfY = originalViewport.height - ((y / rect.height) * originalViewport.height);
+                        // Calculate scale factor
+                        const scaleX = canvas.width / originalViewport.width;
+                        const scaleY = canvas.height / originalViewport.height;
+
+                        // Convert click position to PDF coordinates
+                        let pdfX = x / scaleX;
+                        let pdfY = originalViewport.height - (y / scaleY);
 
                         const signatureBoxSize = signatureBoxSizes[currentSignatureType];
                         const halfWidth = signatureBoxSize.width / 2;
                         const halfHeight = signatureBoxSize.height / 2;
 
+                        // Apply boundary checks in PDF coordinate space
                         if (pdfX - halfWidth < 0) pdfX = halfWidth;
-                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width -
-                            halfWidth;
+                        if (pdfX + halfWidth > originalViewport.width) pdfX = originalViewport.width - halfWidth;
                         if (pdfY - halfHeight < 0) pdfY = halfHeight;
-                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height -
-                            halfHeight;
+                        if (pdfY + halfHeight > originalViewport.height) pdfY = originalViewport.height - halfHeight;
 
                         const llx = Math.round(pdfX - halfWidth);
                         const lly = Math.round(pdfY - halfHeight);
