@@ -345,8 +345,8 @@
                 height: 70
             },
             draft: {
-                width: 85,
-                height: 35
+                width: 42,
+                height: 17
             }
         };
         let currentSignatureType = 'main'; // Mặc định là ký chính
@@ -688,7 +688,6 @@
 
                 const scaleX = pageCanvas.width / originalViewport.width;
                 const scaleY = pageCanvas.height / originalViewport.height;
-console.log(scaleX, scaleY);
 
                 // Set font properties
                 const fontSize = scaleX*10;
