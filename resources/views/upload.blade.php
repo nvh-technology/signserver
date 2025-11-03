@@ -124,8 +124,8 @@
                                 <div class="mb-3">
                                     <label for="line_spacing" class="form-label">Khoảng cách dòng</label>
                                     <input type="number" class="form-control" id="line_spacing" name="line_spacing"
-                                        value="1.1" min="0" max="5" step="0.1">
-                                    <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1.1)</small>
+                                        value="1" min="0" max="5" step="0.1">
+                                    <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1)</small>
                                 </div>
                             </div>
 
@@ -263,8 +263,8 @@
                             <div class="mb-3">
                                 <label for="modal-line-spacing" class="form-label">Khoảng cách dòng</label>
                                 <input type="number" class="form-control" id="modal-line-spacing" name="line_spacing"
-                                    value="1.1" min="0" max="5" step="0.1">
-                                <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1.1)</small>
+                                    value="1" min="0" max="5" step="0.1">
+                                <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1)</small>
                             </div>
 
                             <div class="d-grid">
@@ -771,12 +771,16 @@
                 }];
 
                 // Get line spacing from form
-                const lineSpacingValue = parseFloat(modalLineSpacing.value) || 1.1;
+                const lineSpacingValue = parseFloat(modalLineSpacing.value) || 1;
                 // Đúng theo cách tính của C#: fontSize * lineSpacing (nếu lineSpacing != 0)
-                const lineHeight = lineSpacingValue === 0 ? fontSize * 1.1 : fontSize * lineSpacingValue;
+                var lineHeight = fontSize * 1;
+                if(lineSpacingValue !== 0){
+                    lineHeight = fontSize * (lineSpacingValue/1.1);
+                }
                 const paddingX = 5;
                 const paddingY = 5;
                 const maxWidth = width - (paddingX * 2);
+console.log(lineHeight);
 
                 const wrappedLines = [];
 
