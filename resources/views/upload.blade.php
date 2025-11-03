@@ -771,8 +771,9 @@
                 }];
 
                 // Get line spacing from form
-                const lineSpacingValue = parseFloat(modalLineSpacing.value) || 0;
-                const lineHeight = fontSize * (1 + lineSpacingValue);
+                const lineSpacingValue = parseFloat(modalLineSpacing.value) || 1.1;
+                // Đúng theo cách tính của C#: fontSize * lineSpacing (nếu lineSpacing != 0)
+                const lineHeight = lineSpacingValue === 0 ? fontSize * 1.1 : fontSize * lineSpacingValue;
                 const paddingX = 5;
                 const paddingY = 5;
                 const maxWidth = width - (paddingX * 2);
