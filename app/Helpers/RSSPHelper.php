@@ -21,9 +21,10 @@ class RSSPHelper
      * @param string|null $location The location of signing (PDF only).
      * @param string|null $backgroundSignature The path to the background image for the signature (PDF only).
      * @param string $signatureType The type of signature ('main' or 'draft') (PDF only).
+     * @param string $textAlignment The text alignment for signature ('ALIGN_LEFT', 'ALIGN_CENTER', or 'ALIGN_RIGHT') (PDF only).
      * @return array [bool $status, string $result]
      */
-    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main')
+    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT')
     {
         $sdkDirectory = storage_path(env("RSSP_SDK_DIRECTORY", 'app/private/rssp_sdk'));
         $sdkName = env("RSSP_SDK_NAME", 'Program.exe'); // Updated to match the C# project output
@@ -77,6 +78,11 @@ class RSSPHelper
             } else {
                 // Mặc định là ký chính (170,70)
                 $cmd .= ' --boxSize "170,70"';
+            }
+
+            // Add text alignment parameter
+            if ($textAlignment && in_array($textAlignment, ['ALIGN_LEFT', 'ALIGN_CENTER', 'ALIGN_RIGHT'])) {
+                $cmd .= ' --textAlignment "' . $textAlignment . '"';
             }
         }
 

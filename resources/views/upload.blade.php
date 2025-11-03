@@ -113,6 +113,14 @@
                                     <input type="text" class="form-control" id="location" name="location"
                                         value="Tp. Hồ Chí Minh">
                                 </div>
+                                <div class="mb-3">
+                                    <label for="text_alignment" class="form-label">Căn lề chữ ký</label>
+                                    <select class="form-select" id="text_alignment" name="text_alignment">
+                                        <option value="ALIGN_LEFT" selected>Căn trái</option>
+                                        <option value="ALIGN_CENTER">Căn giữa</option>
+                                        <option value="ALIGN_RIGHT">Căn phải</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2">
@@ -238,6 +246,15 @@
                                     value="Tp. Hồ Chí Minh">
                             </div>
 
+                            <div class="mb-3">
+                                <label for="modal-text-alignment" class="form-label">Căn lề chữ ký</label>
+                                <select class="form-select" id="modal-text-alignment" name="text_alignment">
+                                    <option value="ALIGN_LEFT" selected>Căn trái</option>
+                                    <option value="ALIGN_CENTER">Căn giữa</option>
+                                    <option value="ALIGN_RIGHT">Căn phải</option>
+                                </select>
+                            </div>
+
                             <div class="d-grid">
                                 <button type="button" class="btn btn-primary btn-lg" id="modal-sign-btn">
                                     Ký dữ liệu
@@ -323,11 +340,14 @@
         const modalLocation = document.getElementById('modal-location');
         const modalSignatureType = document.getElementById('modal-signature-type');
         const signatureTypeInput = document.getElementById('signature_type');
+        const modalTextAlignment = document.getElementById('modal-text-alignment');
+        const textAlignmentInput = document.getElementById('text_alignment');
 
         // Add event listeners to update preview when form values change
         modalOwnerId.addEventListener('change', updateSignaturePreview);
         modalReason.addEventListener('input', updateSignaturePreview);
         modalLocation.addEventListener('input', updateSignaturePreview);
+        modalTextAlignment.addEventListener('change', updateSignaturePreview);
 
         function updateSignaturePreview() {
             if (selectedPage && selectedPosition) {
@@ -426,6 +446,7 @@
             modalReason.value = mainReason.value;
             modalLocation.value = mainLocation.value;
             modalSignatureType.value = mainSignatureType.value;
+            modalTextAlignment.value = textAlignmentInput.value;
             currentSignatureType = mainSignatureType.value; // Cập nhật loại chữ ký hiện tại
 
             // Toàn bộ logic load và render PDF được chuyển vào đây
@@ -474,6 +495,7 @@
             mainReason.value = modalReason.value;
             mainLocation.value = modalLocation.value;
             mainSignatureType.value = modalSignatureType.value;
+            textAlignmentInput.value = modalTextAlignment.value;
 
             // Đóng modal và submit form
             bootstrap.Modal.getInstance(pdfModal).hide();
@@ -693,7 +715,21 @@
                 const fontSize = scaleX*10;
                 ctx.font = `${fontSize}px 'Times New Roman'`;
                 ctx.fillStyle = 'red';
-                ctx.textAlign = 'left';
+
+                // Get text alignment from form
+                const textAlignment = modalTextAlignment.value || 'ALIGN_LEFT';
+                switch(textAlignment) {
+                    case 'ALIGN_CENTER':
+                        ctx.textAlign = 'center';
+                        break;
+                    case 'ALIGN_RIGHT':
+                        ctx.textAlign = 'right';
+                        break;
+                    case 'ALIGN_LEFT':
+                    default:
+                        ctx.textAlign = 'left';
+                        break;
+                }
                 ctx.textBaseline = 'top';
 
                 // Get form values
@@ -770,7 +806,24 @@
                 if (currentSignatureType !== 'draft') {
                     wrappedLines.forEach((line, index) => {
                         const y = paddingY + (index * lineHeight);
-                        ctx.fillText(line, paddingX, y);
+
+                        // Calculate x position based on text alignment
+                        let x = paddingX;
+                        const textAlignment = modalTextAlignment.value || 'ALIGN_LEFT';
+                        switch(textAlignment) {
+                            case 'ALIGN_CENTER':
+                                x = width / 2;
+                                break;
+                            case 'ALIGN_RIGHT':
+                                x = width - paddingX;
+                                break;
+                            case 'ALIGN_LEFT':
+                            default:
+                                x = paddingX;
+                                break;
+                        }
+
+                        ctx.fillText(line, x, y);
                     });
                 }
             };

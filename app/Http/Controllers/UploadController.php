@@ -79,7 +79,8 @@ class UploadController extends Controller
             $request->input('reason'),
             $request->input('location'),
             $user->backgroundSignature,
-            $request->input('signature_type', 'main') // Mặc định là ký chính
+            $request->input('signature_type', 'main'), // Mặc định là ký chính
+            $request->input('text_alignment', 'ALIGN_LEFT') // Mặc định là căn trái
         );
 
         // 3. Handle the result
@@ -103,7 +104,7 @@ class UploadController extends Controller
             if (Storage::exists($originalFilePath)) {
                 Storage::delete($originalFilePath);
             }
-            
+
             return back()->with('fail', $errorMessage);
         }
     }

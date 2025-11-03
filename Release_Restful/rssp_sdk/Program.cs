@@ -48,6 +48,7 @@ namespace RSSPAPI
         public static string signaturePosition;
         public static string relyingPartyKeyStore;
         public static string signatureType = "main"; // Default to "main", can be "draft"
+        public static string textAlignment = "ALIGN_LEFT"; // Default to "ALIGN_LEFT", can be "ALIGN_CENTER" or "ALIGN_RIGHT"
 
         static void Main(string[] args)
         {
@@ -107,6 +108,9 @@ namespace RSSPAPI
                     case "--signatureType":
                         signatureType = args[++i];
                         break;
+                    case "--textAlignment":
+                        textAlignment = args[++i];
+                        break;
                 }
             }
 
@@ -134,6 +138,7 @@ namespace RSSPAPI
                 Console.Error.WriteLine("  --page: Page number for the visible signature.");
                 Console.Error.WriteLine("  --position: Coordinates for the visible signature (format: llx,lly,urx,ury).");
                 Console.Error.WriteLine("  --signatureType: Type of signature: 'main' (with text) or 'draft' (background only, default: 'main').");
+                Console.Error.WriteLine("  --textAlignment: Text alignment for signature: 'ALIGN_LEFT', 'ALIGN_CENTER', or 'ALIGN_RIGHT' (default: 'ALIGN_LEFT').");
                 return;
             }
 
@@ -219,7 +224,24 @@ namespace RSSPAPI
                     if (signatureType != "draft")
                     {
                         byte[] Font = File.ReadAllBytes("font-times-new-roman.ttf");
-                        profile.SetFont(Font, BaseFont.CP1252, true, 10, 0, TextAlignment.ALIGN_LEFT, DefaultColor.RED);
+
+                        // Parse text alignment parameter
+                        TextAlignment alignment = TextAlignment.ALIGN_LEFT; // Default
+                        switch (textAlignment.ToUpper())
+                        {
+                            case "ALIGN_CENTER":
+                                alignment = TextAlignment.ALIGN_CENTER;
+                                break;
+                            case "ALIGN_RIGHT":
+                                alignment = TextAlignment.ALIGN_RIGHT;
+                                break;
+                            case "ALIGN_LEFT":
+                            default:
+                                alignment = TextAlignment.ALIGN_LEFT;
+                                break;
+                        }
+
+                        profile.SetFont(Font, BaseFont.CP1252, true, 10, 0, alignment, DefaultColor.RED);
                     }
 
                     SigningMethodAsyncImp signInit = new SigningMethodAsyncImp();
