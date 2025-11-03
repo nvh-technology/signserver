@@ -22,9 +22,10 @@ class RSSPHelper
      * @param string|null $backgroundSignature The path to the background image for the signature (PDF only).
      * @param string $signatureType The type of signature ('main' or 'draft') (PDF only).
      * @param string $textAlignment The text alignment for signature ('ALIGN_LEFT', 'ALIGN_CENTER', or 'ALIGN_RIGHT') (PDF only).
+     * @param float $lineSpacing Line spacing for text (PDF only).
      * @return array [bool $status, string $result]
      */
-    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT')
+    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT', $lineSpacing = 0)
     {
         $sdkDirectory = storage_path(env("RSSP_SDK_DIRECTORY", 'app/private/rssp_sdk'));
         $sdkName = env("RSSP_SDK_NAME", 'Program.exe'); // Updated to match the C# project output
@@ -83,6 +84,11 @@ class RSSPHelper
             // Add text alignment parameter
             if ($textAlignment && in_array($textAlignment, ['ALIGN_LEFT', 'ALIGN_CENTER', 'ALIGN_RIGHT'])) {
                 $cmd .= ' --textAlignment "' . $textAlignment . '"';
+            }
+
+            // Add line spacing parameter
+            if (is_numeric($lineSpacing) && $lineSpacing >= 0) {
+                $cmd .= ' --lineSpacing "' . $lineSpacing . '"';
             }
         }
 

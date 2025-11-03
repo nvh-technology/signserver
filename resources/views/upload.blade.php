@@ -121,6 +121,12 @@
                                         <option value="ALIGN_RIGHT">Căn phải</option>
                                     </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="line_spacing" class="form-label">Khoảng cách dòng</label>
+                                    <input type="number" class="form-control" id="line_spacing" name="line_spacing"
+                                        value="0" min="0" max="5" step="0.1">
+                                    <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 0)</small>
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2">
@@ -254,6 +260,12 @@
                                     <option value="ALIGN_RIGHT">Căn phải</option>
                                 </select>
                             </div>
+                            <div class="mb-3">
+                                <label for="modal-line-spacing" class="form-label">Khoảng cách dòng</label>
+                                <input type="number" class="form-control" id="modal-line-spacing" name="line_spacing"
+                                    value="0" min="0" max="5" step="0.1">
+                                <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 0)</small>
+                            </div>
 
                             <div class="d-grid">
                                 <button type="button" class="btn btn-primary btn-lg" id="modal-sign-btn">
@@ -342,12 +354,15 @@
         const signatureTypeInput = document.getElementById('signature_type');
         const modalTextAlignment = document.getElementById('modal-text-alignment');
         const textAlignmentInput = document.getElementById('text_alignment');
+        const modalLineSpacing = document.getElementById('modal-line-spacing');
+        const lineSpacingInput = document.getElementById('line_spacing');
 
         // Add event listeners to update preview when form values change
         modalOwnerId.addEventListener('change', updateSignaturePreview);
         modalReason.addEventListener('input', updateSignaturePreview);
         modalLocation.addEventListener('input', updateSignaturePreview);
         modalTextAlignment.addEventListener('change', updateSignaturePreview);
+        modalLineSpacing.addEventListener('input', updateSignaturePreview);
 
         function updateSignaturePreview() {
             if (selectedPage && selectedPosition) {
@@ -447,6 +462,7 @@
             modalLocation.value = mainLocation.value;
             modalSignatureType.value = mainSignatureType.value;
             modalTextAlignment.value = textAlignmentInput.value;
+            modalLineSpacing.value = lineSpacingInput.value;
             currentSignatureType = mainSignatureType.value; // Cập nhật loại chữ ký hiện tại
 
             // Toàn bộ logic load và render PDF được chuyển vào đây
@@ -496,6 +512,7 @@
             mainLocation.value = modalLocation.value;
             mainSignatureType.value = modalSignatureType.value;
             textAlignmentInput.value = modalTextAlignment.value;
+            lineSpacingInput.value = modalLineSpacing.value;
 
             // Đóng modal và submit form
             bootstrap.Modal.getInstance(pdfModal).hide();
@@ -753,7 +770,9 @@
                     value: reason
                 }];
 
-                const lineHeight = fontSize * 1;
+                // Get line spacing from form
+                const lineSpacingValue = parseFloat(modalLineSpacing.value) || 0;
+                const lineHeight = fontSize * (1 + lineSpacingValue);
                 const paddingX = 5;
                 const paddingY = 5;
                 const maxWidth = width - (paddingX * 2);

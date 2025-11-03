@@ -80,7 +80,8 @@ class UploadController extends Controller
             $request->input('location'),
             $user->backgroundSignature,
             $request->input('signature_type', 'main'), // Mặc định là ký chính
-            $request->input('text_alignment', 'ALIGN_LEFT') // Mặc định là căn trái
+            $request->input('text_alignment', 'ALIGN_LEFT'), // Mặc định là căn trái
+            $request->input('line_spacing', 0) // Mặc định là 0
         );
 
         // 3. Handle the result

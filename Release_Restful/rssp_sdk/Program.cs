@@ -49,6 +49,7 @@ namespace RSSPAPI
         public static string relyingPartyKeyStore;
         public static string signatureType = "main"; // Default to "main", can be "draft"
         public static string textAlignment = "ALIGN_LEFT"; // Default to "ALIGN_LEFT", can be "ALIGN_CENTER" or "ALIGN_RIGHT"
+        public static float lineSpacing = 0f; // Default line spacing for text
 
         static void Main(string[] args)
         {
@@ -111,6 +112,15 @@ namespace RSSPAPI
                     case "--textAlignment":
                         textAlignment = args[++i];
                         break;
+                    case "--lineSpacing":
+                        try {
+                            lineSpacing = float.Parse(args[++i]);
+                        }
+                        catch (Exception ex) {
+                            Console.Error.WriteLine($"Invalid lineSpacing value: {ex.Message}");
+                            lineSpacing = 0f;
+                        }
+                        break;
                 }
             }
 
@@ -139,6 +149,7 @@ namespace RSSPAPI
                 Console.Error.WriteLine("  --position: Coordinates for the visible signature (format: llx,lly,urx,ury).");
                 Console.Error.WriteLine("  --signatureType: Type of signature: 'main' (with text) or 'draft' (background only, default: 'main').");
                 Console.Error.WriteLine("  --textAlignment: Text alignment for signature: 'ALIGN_LEFT', 'ALIGN_CENTER', or 'ALIGN_RIGHT' (default: 'ALIGN_LEFT').");
+                Console.Error.WriteLine("  --lineSpacing: Line spacing for text (default: 0).");
                 return;
             }
 
@@ -241,7 +252,7 @@ namespace RSSPAPI
                                 break;
                         }
 
-                        profile.SetFont(Font, BaseFont.CP1252, true, 10, 0, alignment, DefaultColor.RED);
+                        profile.SetFont(Font, BaseFont.CP1252, true, 10, lineSpacing, alignment, DefaultColor.RED);
                     }
 
                     SigningMethodAsyncImp signInit = new SigningMethodAsyncImp();
