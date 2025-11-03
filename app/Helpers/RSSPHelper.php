@@ -25,7 +25,7 @@ class RSSPHelper
      * @param float $lineSpacing Line spacing for text (PDF only).
      * @return array [bool $status, string $result]
      */
-    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT', $lineSpacing = 0)
+    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT', $lineSpacing = 1.1)
     {
         $sdkDirectory = storage_path(env("RSSP_SDK_DIRECTORY", 'app/private/rssp_sdk'));
         $sdkName = env("RSSP_SDK_NAME", 'Program.exe'); // Updated to match the C# project output

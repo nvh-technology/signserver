@@ -49,7 +49,7 @@ namespace RSSPAPI
         public static string relyingPartyKeyStore;
         public static string signatureType = "main"; // Default to "main", can be "draft"
         public static string textAlignment = "ALIGN_LEFT"; // Default to "ALIGN_LEFT", can be "ALIGN_CENTER" or "ALIGN_RIGHT"
-        public static float lineSpacing = 0f; // Default line spacing for text
+        public static float lineSpacing = 1.1f; // Default line spacing for text (1.1f as per library default)
 
         static void Main(string[] args)
         {
