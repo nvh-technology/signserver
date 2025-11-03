@@ -124,8 +124,8 @@
                                 <div class="mb-3">
                                     <label for="line_spacing" class="form-label">Khoảng cách dòng</label>
                                     <input type="number" class="form-control" id="line_spacing" name="line_spacing"
-                                        value="1" min="0" max="5" step="0.1">
-                                    <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1)</small>
+                                        value="1.5" min="0" max="5" step="0.1">
+                                    <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1.5)</small>
                                 </div>
                             </div>
 
@@ -263,8 +263,8 @@
                             <div class="mb-3">
                                 <label for="modal-line-spacing" class="form-label">Khoảng cách dòng</label>
                                 <input type="number" class="form-control" id="modal-line-spacing" name="line_spacing"
-                                    value="1" min="0" max="5" step="0.1">
-                                <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1)</small>
+                                    value="1.5" min="0" max="5" step="0.1">
+                                <small class="form-text text-muted">Giá trị từ 0 đến 5 (mặc định: 1.5)</small>
                             </div>
 
                             <div class="d-grid">
@@ -780,7 +780,6 @@
                 const paddingX = 5;
                 const paddingY = 5;
                 const maxWidth = width - (paddingX * 2);
-console.log(lineHeight);
 
                 const wrappedLines = [];
 
@@ -801,7 +800,7 @@ console.log(lineHeight);
                 let finalHeight = height;
 
                 // Resize logic only for non-draft
-                if (currentSignatureType !== 'draft' && requiredHeight > height) {
+                if (currentSignatureType !== 'draft' && requiredHeight != height) {
                     const oldHeight = height;
                     finalHeight = requiredHeight;
 
@@ -815,10 +814,21 @@ console.log(lineHeight);
                     }
 
                     // Reset font after resize
-                    ctx.font = `${fontSize}px TimesNewRoman`;
+                    ctx.font = `${fontSize}px 'Times New Roman'`;
                     ctx.fillStyle = 'red';
-                    ctx.textAlign = 'left';
                     ctx.textBaseline = 'top';
+                    switch(textAlignment) {
+                        case 'ALIGN_CENTER':
+                            ctx.textAlign = 'center';
+                            break;
+                        case 'ALIGN_RIGHT':
+                            ctx.textAlign = 'right';
+                            break;
+                        case 'ALIGN_LEFT':
+                        default:
+                            ctx.textAlign = 'left';
+                            break;
+                    }
                 }
 
                 // Draw background if it exists
@@ -833,7 +843,9 @@ console.log(lineHeight);
 
                         // Calculate x position based on text alignment
                         let x = paddingX;
+                        
                         const textAlignment = modalTextAlignment.value || 'ALIGN_LEFT';
+                        
                         switch(textAlignment) {
                             case 'ALIGN_CENTER':
                                 x = width / 2;
@@ -846,7 +858,6 @@ console.log(lineHeight);
                                 x = paddingX;
                                 break;
                         }
-
                         ctx.fillText(line, x, y);
                     });
                 }
