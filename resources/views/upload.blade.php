@@ -116,10 +116,22 @@
                                 <div class="mb-3">
                                     <label for="text_alignment" class="form-label">Căn lề chữ ký</label>
                                     <select class="form-select" id="text_alignment" name="text_alignment">
-                                        <option value="ALIGN_LEFT" selected>Căn trái</option>
-                                        <option value="ALIGN_CENTER">Căn giữa</option>
+                                        <option value="ALIGN_LEFT">Căn trái</option>
+                                        <option value="ALIGN_CENTER" selected>Căn giữa</option>
                                         <option value="ALIGN_RIGHT">Căn phải</option>
                                     </select>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="text_bold" name="text_bold">
+                                        <label class="form-check-label" for="text_bold">Chữ đậm</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="text_italic" name="text_italic">
+                                        <label class="form-check-label" for="text_italic">Chữ nghiêng</label>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="line_spacing" class="form-label">Khoảng cách dòng</label>
@@ -255,10 +267,22 @@
                             <div class="mb-3">
                                 <label for="modal-text-alignment" class="form-label">Căn lề chữ ký</label>
                                 <select class="form-select" id="modal-text-alignment" name="text_alignment">
-                                    <option value="ALIGN_LEFT" selected>Căn trái</option>
-                                    <option value="ALIGN_CENTER">Căn giữa</option>
+                                    <option value="ALIGN_LEFT">Căn trái</option>
+                                    <option value="ALIGN_CENTER" selected>Căn giữa</option>
                                     <option value="ALIGN_RIGHT">Căn phải</option>
                                 </select>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="modal-text-bold" name="text_bold">
+                                    <label class="form-check-label" for="modal-text-bold">Chữ đậm</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="modal-text-italic" name="text_italic">
+                                    <label class="form-check-label" for="modal-text-italic">Chữ nghiêng</label>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="modal-line-spacing" class="form-label">Khoảng cách dòng</label>
@@ -356,6 +380,10 @@
         const textAlignmentInput = document.getElementById('text_alignment');
         const modalLineSpacing = document.getElementById('modal-line-spacing');
         const lineSpacingInput = document.getElementById('line_spacing');
+        const modalTextBold = document.getElementById('modal-text-bold');
+        const textBoldInput = document.getElementById('text_bold');
+        const modalTextItalic = document.getElementById('modal-text-italic');
+        const textItalicInput = document.getElementById('text_italic');
 
         // Add event listeners to update preview when form values change
         modalOwnerId.addEventListener('change', updateSignaturePreview);
@@ -363,6 +391,8 @@
         modalLocation.addEventListener('input', updateSignaturePreview);
         modalTextAlignment.addEventListener('change', updateSignaturePreview);
         modalLineSpacing.addEventListener('input', updateSignaturePreview);
+        modalTextBold.addEventListener('change', updateSignaturePreview);
+        modalTextItalic.addEventListener('change', updateSignaturePreview);
 
         function updateSignaturePreview() {
             if (selectedPage && selectedPosition) {
@@ -463,6 +493,8 @@
             modalSignatureType.value = mainSignatureType.value;
             modalTextAlignment.value = textAlignmentInput.value;
             modalLineSpacing.value = lineSpacingInput.value;
+            modalTextBold.checked = textBoldInput.checked;
+            modalTextItalic.checked = textItalicInput.checked;
             currentSignatureType = mainSignatureType.value; // Cập nhật loại chữ ký hiện tại
 
             // Toàn bộ logic load và render PDF được chuyển vào đây
@@ -513,6 +545,8 @@
             mainSignatureType.value = modalSignatureType.value;
             textAlignmentInput.value = modalTextAlignment.value;
             lineSpacingInput.value = modalLineSpacing.value;
+            textBoldInput.checked = modalTextBold.checked;
+            textItalicInput.checked = modalTextItalic.checked;
 
             // Đóng modal và submit form
             bootstrap.Modal.getInstance(pdfModal).hide();
@@ -615,7 +649,7 @@
         let customFont = null;
         async function loadCustomFont() {
             try {
-                const fontFace = new FontFace('TimesNewRoman', 'url({{ asset('fonts/times-new-roman.ttf') }})');
+                const fontFace = new FontFace('Times New Roman', 'url({{ asset('fonts/times-new-roman.ttf') }})');
                 const loadedFont = await fontFace.load();
                 document.fonts.add(loadedFont);
                 customFont = loadedFont;
@@ -730,7 +764,10 @@
 
                 // Set font properties
                 const fontSize = scaleX*10;
-                ctx.font = `${fontSize}px 'Times New Roman'`;
+                let fontStyle = '';
+                if (modalTextBold.checked) fontStyle += 'bold ';
+                if (modalTextItalic.checked) fontStyle += 'italic ';
+                ctx.font = `${fontStyle}${fontSize}px 'Times New Roman'`;
                 ctx.fillStyle = 'red';
 
                 // Get text alignment from form
@@ -814,7 +851,10 @@
                     }
 
                     // Reset font after resize
-                    ctx.font = `${fontSize}px 'Times New Roman'`;
+                    let fontStyle = '';
+                    if (modalTextBold.checked) fontStyle += 'bold ';
+                    if (modalTextItalic.checked) fontStyle += 'italic ';
+                    ctx.font = `${fontStyle}${fontSize}px TimesNewRoman`;
                     ctx.fillStyle = 'red';
                     ctx.textBaseline = 'top';
                     switch(textAlignment) {
@@ -843,9 +883,9 @@
 
                         // Calculate x position based on text alignment
                         let x = paddingX;
-                        
+
                         const textAlignment = modalTextAlignment.value || 'ALIGN_LEFT';
-                        
+
                         switch(textAlignment) {
                             case 'ALIGN_CENTER':
                                 x = width / 2;

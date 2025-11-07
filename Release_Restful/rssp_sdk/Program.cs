@@ -50,6 +50,8 @@ namespace RSSPAPI
         public static string signatureType = "main"; // Default to "main", can be "draft"
         public static string textAlignment = "ALIGN_LEFT"; // Default to "ALIGN_LEFT", can be "ALIGN_CENTER" or "ALIGN_RIGHT"
         public static float lineSpacing = 1.1f; // Default line spacing for text (1.1f as per library default)
+        public static bool textBold = false; // Default to false for bold text
+        public static bool textItalic = false; // Default to false for italic text
 
         static void Main(string[] args)
         {
@@ -121,13 +123,31 @@ namespace RSSPAPI
                             lineSpacing = 0f;
                         }
                         break;
+                    case "--textBold":
+                        try {
+                            textBold = bool.Parse(args[++i]);
+                        }
+                        catch (Exception ex) {
+                            Console.Error.WriteLine($"Invalid textBold value: {ex.Message}");
+                            textBold = false;
+                        }
+                        break;
+                    case "--textItalic":
+                        try {
+                            textItalic = bool.Parse(args[++i]);
+                        }
+                        catch (Exception ex) {
+                            Console.Error.WriteLine($"Invalid textItalic value: {ex.Message}");
+                            textItalic = false;
+                        }
+                        break;
                 }
             }
 
             // Argument validation and usage instructions
             if (string.IsNullOrEmpty(PATH_TO_FILE_CONFIG) || string.IsNullOrEmpty(relyingPartyKeyStore) || string.IsNullOrEmpty(passCode) || (string.IsNullOrEmpty(filePDF) && string.IsNullOrEmpty(fileOffice)) || (string.IsNullOrEmpty(userID) && string.IsNullOrEmpty(credentialID)))
             {
-                Console.Error.WriteLine("Usage: Program.exe --fileConfig <path> --keystoreFile <path> (--userID <id> | --credentialID <id>) --passCode <pass> (--filePDF <path> | --fileOffice <path>) [--signedsPath <path>] [--reason <text>] [--location <text>] [--backgroundPath <path>] [--offset <x,y>] [--boxSize <width,height>] [--titleText <text>] [--page <page>] [--position <llx,lly,urx,ury>] [--signatureType <main|draft>]");
+                Console.Error.WriteLine("Usage: Program.exe --fileConfig <path> --keystoreFile <path> (--userID <id> | --credentialID <id>) --passCode <pass> (--filePDF <path> | --fileOffice <path>) [--signedsPath <path>] [--reason <text>] [--location <text>] [--backgroundPath <path>] [--offset <x,y>] [--boxSize <width,height>] [--titleText <text>] [--page <page>] [--position <llx,lly,urx,ury>] [--signatureType <main|draft>] [--textBold <true|false>] [--textItalic <true|false>]");
                 Console.Error.WriteLine("  --fileConfig: Path to the configuration file.");
                 Console.Error.WriteLine("  --userID: User ID for listing certificates (required if --credentialID is not used).");
                 Console.Error.WriteLine("  --credentialID: Specific credential ID to use (skips certificate listing).");
@@ -150,6 +170,8 @@ namespace RSSPAPI
                 Console.Error.WriteLine("  --signatureType: Type of signature: 'main' (with text) or 'draft' (background only, default: 'main').");
                 Console.Error.WriteLine("  --textAlignment: Text alignment for signature: 'ALIGN_LEFT', 'ALIGN_CENTER', or 'ALIGN_RIGHT' (default: 'ALIGN_LEFT').");
                 Console.Error.WriteLine("  --lineSpacing: Line spacing for text (default: 0).");
+                Console.Error.WriteLine("  --textBold: Apply bold formatting to text (default: false).");
+                Console.Error.WriteLine("  --textItalic: Apply italic formatting to text (default: false).");
                 return;
             }
 
@@ -206,7 +228,23 @@ namespace RSSPAPI
                     }
                     else
                     {
-                        profile.SetTextContent("Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}");
+                        string textContent = "Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}";
+
+                        // Apply formatting tags based on textBold and textItalic
+                        if (textBold && textItalic)
+                        {
+                            textContent = $"<bi>{textContent}</bi>";
+                        }
+                        else if (textBold)
+                        {
+                            textContent = $"<b>{textContent}</b>";
+                        }
+                        else if (textItalic)
+                        {
+                            textContent = $"<i>{textContent}</i>";
+                        }
+
+                        profile.SetTextContent(textContent);
                     }
 
                     if (!string.IsNullOrEmpty(signaturePage) && !string.IsNullOrEmpty(signaturePosition))

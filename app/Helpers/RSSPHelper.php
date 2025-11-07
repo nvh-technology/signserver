@@ -23,9 +23,11 @@ class RSSPHelper
      * @param string $signatureType The type of signature ('main' or 'draft') (PDF only).
      * @param string $textAlignment The text alignment for signature ('ALIGN_LEFT', 'ALIGN_CENTER', or 'ALIGN_RIGHT') (PDF only).
      * @param float $lineSpacing Line spacing for text (PDF only).
+     * @param bool $textBold Apply bold formatting to text (PDF only).
+     * @param bool $textItalic Apply italic formatting to text (PDF only).
      * @return array [bool $status, string $result]
      */
-    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT', $lineSpacing = 1.1)
+    public static function signFile($fileToSign, $fileExtension, OwnerUser $ownerUser, $signaturePage = null, $signaturePosition = null, $reason = null, $location = null, $backgroundSignature = null, $signatureType = 'main', $textAlignment = 'ALIGN_LEFT', $lineSpacing = 1.1, $textBold = false, $textItalic = false)
     {
         $sdkDirectory = storage_path(env("RSSP_SDK_DIRECTORY", 'app/private/rssp_sdk'));
         $sdkName = env("RSSP_SDK_NAME", 'Program.exe'); // Updated to match the C# project output
@@ -89,6 +91,16 @@ class RSSPHelper
             // Add line spacing parameter
             if (is_numeric($lineSpacing) && $lineSpacing >= 0) {
                 $cmd .= ' --lineSpacing "' . $lineSpacing . '"';
+            }
+
+            // Add text bold parameter
+            if ($textBold) {
+                $cmd .= ' --textBold true';
+            }
+
+            // Add text italic parameter
+            if ($textItalic) {
+                $cmd .= ' --textItalic true';
             }
         }
 
