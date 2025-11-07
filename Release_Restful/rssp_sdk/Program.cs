@@ -230,19 +230,19 @@ namespace RSSPAPI
                     {
                         string textContent = "Ký bởi: {signby} \nNgày ký: {date} \nNơi ký: {location} \nLý do: {reason}";
 
-                        // Apply formatting tags based on textBold and textItalic
-                        if (textBold && textItalic)
-                        {
-                            textContent = $"<bi>{textContent}</bi>";
-                        }
-                        else if (textBold)
-                        {
-                            textContent = $"<b>{textContent}</b>";
-                        }
-                        else if (textItalic)
-                        {
-                            textContent = $"<i>{textContent}</i>";
-                        }
+                        //// Apply formatting tags based on textBold and textItalic
+                        //if (textBold && textItalic)
+                        //{
+                        //    textContent = $"<bi>{textContent}</bi>";
+                        //}
+                        //else if (textBold)
+                        //{
+                        //    textContent = $"<b>{textContent}</b>";
+                        //}
+                        //else if (textItalic)
+                        //{
+                        //    textContent = $"<i>{textContent}</i>";
+                        //}
 
                         profile.SetTextContent(textContent);
                     }
@@ -272,8 +272,21 @@ namespace RSSPAPI
                     // Only set font if signatureType is NOT "draft"
                     if (signatureType != "draft")
                     {
-                        byte[] Font = File.ReadAllBytes("font-times-new-roman.ttf");
 
+                        byte[] Font = File.ReadAllBytes("times.ttf");
+
+                        if (textBold && textItalic)
+                        {
+                            Font = File.ReadAllBytes("timesbi.ttf");
+                        }
+                        else if (textBold)
+                        {
+                            Font = File.ReadAllBytes("timesbd.ttf");
+                        }
+                        else if (textItalic)
+                        {
+                            Font = File.ReadAllBytes("timesi.ttf");
+                        }
                         // Parse text alignment parameter
                         TextAlignment alignment = TextAlignment.ALIGN_LEFT; // Default
                         switch (textAlignment.ToUpper())
@@ -290,7 +303,7 @@ namespace RSSPAPI
                                 break;
                         }
 
-                        profile.SetFont(Font, BaseFont.CP1252, true, 10, lineSpacing, alignment, DefaultColor.RED);
+                        profile.SetFont(Font, BaseFont.IDENTITY_H, true, 10, lineSpacing, alignment, DefaultColor.RED);
                     }
 
                     SigningMethodAsyncImp signInit = new SigningMethodAsyncImp();

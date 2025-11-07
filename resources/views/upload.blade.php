@@ -351,6 +351,43 @@
 @endsection
 
 @push('scripts')
+    <style>
+        /* Định nghĩa họ font Times New Roman với 4 kiểu */
+
+        /* 1. Kiểu Thường (Regular) */
+        @font-face {
+        font-family: 'Times New Roman';
+        font-style: normal;
+        font-weight: 400; /* 400 là "normal" */
+        src: url('{{ asset('fonts/times.ttf') }}') format('truetype');
+        }
+
+        /* 2. Kiểu Nghiêng (Italic) */
+        @font-face {
+        font-family: 'Times New Roman';
+        font-style: italic;
+        font-weight: 400;
+        src: url('{{ asset('fonts/timesi.ttf') }}') format('truetype');
+        }
+
+        /* 3. Kiểu Đậm (Bold) */
+        @font-face {
+        font-family: 'Times New Roman';
+        font-style: normal;
+        font-weight: 900; /* 700 là "bold" */
+        src: url('{{ asset('fonts/timesbd.ttf') }}') format('truetype');
+        }
+
+        /* 4. Kiểu Đậm Nghiêng (Bold Italic) */
+        @font-face {
+        font-family: 'Times New Roman';
+        font-style: italic;
+        font-weight: 700;
+        src: url('{{ asset('fonts/timesbi.ttf') }}') format('truetype');
+        }
+
+  
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js";
@@ -645,22 +682,22 @@
         }
 
 
-        // Load custom font
-        let customFont = null;
-        async function loadCustomFont() {
-            try {
-                const fontFace = new FontFace('Times New Roman', 'url({{ asset('fonts/times-new-roman.ttf') }})');
-                const loadedFont = await fontFace.load();
-                document.fonts.add(loadedFont);
-                customFont = loadedFont;
-                console.log('Font Times New Roman loaded successfully');
-            } catch (error) {
-                console.error('Failed to load Times New Roman font:', error);
-            }
-        }
+        // // Load custom font
+        // let customFont = null;
+        // async function loadCustomFont() {
+        //     try {
+        //         const fontFace = new FontFace('Times New Roman', 'url({{ asset('fonts/times-new-roman.ttf') }})');
+        //         const loadedFont = await fontFace.load();
+        //         document.fonts.add(loadedFont);
+        //         customFont = loadedFont;
+        //         console.log('Font Times New Roman loaded successfully');
+        //     } catch (error) {
+        //         console.error('Failed to load Times New Roman font:', error);
+        //     }
+        // }
 
-        // Load font when page loads
-        loadCustomFont();
+        // // Load font when page loads
+        // loadCustomFont();
 
         function createOrUpdateHighlight(pageNum, position) {
             clearHighlight();
